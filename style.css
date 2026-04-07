@@ -1,0 +1,456 @@
+/* ================= VARIABLES & RESET ================= */
+:root {
+    --black: #000000;
+    --white: #FFFFFF;
+    --gray-light: #F7F7F7;
+    --gray-text: #666666;
+    --container-width: 1440px;
+    --padding-x: 80px;
+    --transition: 0.3s ease;
+    
+    /* Há»† THá»NG FONT THEO FIGMA */
+    --font-heading: 'Bebas Neue', sans-serif;
+    --font-climate: 'Climate Crisis', sans-serif; /* Cho Hero Title */
+    --font-serif: 'Playfair Display', serif;      /* Cho Menu & TiÃªu Ä‘á» phá»¥ */
+    --font-body: 'Quicksand', sans-serif;         /* Cho vÄƒn báº£n dÃ i & Form */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body); /* Máº·c Ä‘á»‹nh vÄƒn báº£n dÃ i dÃ¹ng Quicksand */
+    background-color: var(--white);
+    color: var(--black);
+    overflow-x: hidden;
+    font-weight: 500;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* ================= Bá» Cá»¤C KHUNG CHUáº¨N Äá»’NG NHáº¤T ================= */
+.container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 var(--padding-x);
+}
+
+@media (max-width: 768px) {
+    :root { --padding-x: 24px; }
+}
+
+/* ================= DÃ’NG Káºº PHÃ‚N CÃCH (CHIA SECTION) ================= */
+.section-divider {
+    border: none;
+    border-top: 1px solid #EAEAEA;
+    width: 100%;
+    margin: 60px 0;
+}
+
+/* ================= 2. HEADER ================= */
+header {
+    border-bottom: 1px solid #eee;
+}
+
+.header-inner {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    letter-spacing: 2px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-menu a {
+    font-family: var(--font-serif); /* Font Playfair Display cho Menu */
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: capitalize; /* ThÆ°á»ng Playfair Ä‘á»ƒ Capitalize sáº½ sang hÆ¡n */
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+}
+
+.nav-menu a:hover {
+    color: var(--gray-text);
+}
+
+.nav-separator {
+    color: #ddd;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.header-icons {
+    display: flex;
+    gap: 24px;
+    font-size: 18px;
+}
+
+.header-icons i { cursor: pointer; transition: var(--transition); }
+.header-icons i:hover { color: var(--gray-text); }
+
+/* ================= 3. HERO SECTION ================= */
+.hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin: 80px auto 40px auto;
+}
+
+.hero-text h1 {
+    font-family: var(--font-climate); /* Font Climate Crisis cho Hero Title */
+    font-weight: 400;
+    font-size: clamp(60px, 8vw, 130px);
+    line-height: 0.9;
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    /* Äiá»u chá»‰nh trá»¥c YEAR Ä‘á»ƒ font "cháº£y" Ä‘Ãºng Ã½ Ä‘á»“ thiáº¿t káº¿ */
+    font-variation-settings: "YEAR" 1979; 
+}
+
+.hero-text p {
+    font-family: var(--font-body); /* Font Quicksand cho vÄƒn báº£n dÃ i */
+    color: var(--gray-text);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.6;
+    max-width: 400px;
+    margin-bottom: 40px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 16px;
+}
+
+.btn {
+    padding: 16px 32px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body); /* NÃºt báº¥m dÃ¹ng Quicksand */
+}
+
+.btn-primary {
+    background-color: var(--black);
+    color: var(--white);
+    border: 1px solid var(--black);
+}
+
+.btn-primary:hover {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.btn-outline:hover {
+    background-color: var(--black);
+    color: var(--white);
+}
+
+.hero-image {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.hero-image img {
+    width: 90%;
+    filter: drop-shadow(0 30px 40px rgba(0,0,0,0.2));
+    transition: var(--transition);
+}
+
+.hero-image img:hover {
+    transform: scale(1.05) translateY(-5px);
+}
+
+.hero-img-caption {
+    width: 90%;
+    font-family: var(--font-serif); /* Font Playfair Display */
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--black);
+    margin-top: 16px;
+    text-align: left;
+}
+
+/* ================= 4 & 5. FEATURED SNEAKERS ================= */
+.featured-section {
+    margin-bottom: 60px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-family: var(--font-serif); /* Font Playfair Display */
+    font-size: clamp(36px, 4vw, 44px);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.explore-more {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--black);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+ 
+.explore-more:hover { color: var(--gray-text); }
+
+.brand-subtitle {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-text);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 40px 0 20px 0;
+}
+
+/* ... carousel-wrapper, product-grid, product-card, card-top, v.v giá»¯ nguyÃªn ... */
+.carousel-wrapper { position: relative; }
+.carousel-next { position: absolute; right: -45px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 20px; color: var(--gray-text); cursor: pointer; transition: var(--transition); }
+.carousel-next:hover { color: var(--black); }
+.product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+.product-card {
+    background-color: var(--gray-light);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.card-title { font-weight: 700; font-size: 16px; line-height: 1.4; font-family: var(--font-body); }
+.card-colors { font-size: 11px; font-weight: 700; color: var(--gray-text); margin-top: 6px; text-transform: uppercase; font-family: var(--font-body); }
+.wishlist-icon { background: var(--white); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
+.wishlist-icon:hover { color: red; }
+.product-img { margin: 10px auto 40px auto; width: 85%; transition: var(--transition); }
+.product-card:hover .product-img { transform: scale(1.05); }
+.card-bottom { display: flex; justify-content: space-between; align-items: center; }
+.price-rating { font-weight: 800; font-size: 15px; font-family: var(--font-body); }
+.price-rating span { font-weight: 600; font-size: 12px; color: #ffb800; margin-left: 8px; }
+.btn-add { padding: 8px 16px; border: 1px solid var(--black); border-radius: 999px; background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition); font-family: var(--font-body); }
+.btn-add:hover { background: var(--black); color: var(--white); }
+
+/* ================= 6. BEST SHOES COLLECTION ================= */
+.best-collection { margin-bottom: 60px; text-align: center; }
+.best-collection h2 {
+    font-family: var(--font-serif); /* Playfair Display */
+    font-size: clamp(36px, 4vw, 44px);
+    font-weight: 700;
+}
+
+.collection-layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; padding: 30px 0 0; max-width: 1000px; margin: 0 auto; }
+.pill-banner { width: 100%; height: auto; aspect-ratio: 1 / 2.2; border-radius: 999px; background-color: var(--black); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 5%; transition: var(--transition); cursor: pointer; position: relative; overflow: hidden; }
+.pill-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; z-index: 0; }
+.pill-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); opacity: 0; transition: all 0.4s ease; z-index: 1; }
+.pill-banner h3 { font-family: var(--font-heading); font-size: clamp(24px, 2.5vw, 36px); line-height: 1.1; color: var(--white); z-index: 2; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
+.pill-banner:hover .pill-overlay { opacity: 1; }
+.pill-banner:hover h3 { opacity: 1; transform: translateY(0); }
+.pill-banner:hover .pill-bg-image { transform: scale(1.05); }
+
+.best-collection-desc {
+    font-family: var(--font-body); /* Quicksand */
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-text);
+    margin: 30px auto 0;
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+/* ... 3D Model Wrapper giá»¯ nguyÃªn ... */
+.model-wrapper { width: 100%; height: auto; aspect-ratio: 1 / 2.2; border-radius: 999px; background-color: #E2E2E2; position: relative; cursor: pointer; }
+.model-img-inner { width: 135%; height: 135%; object-fit: contain; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); filter: drop-shadow(10px 15px 25px rgba(0,0,0,0.25)); transition: transform 0.4s ease; z-index: 2; }
+.model-wrapper:hover .model-img-inner { transform: translate(-50%, -50%) scale(1.02) translateY(-10px); }
+
+/* ================= 7. CONTACT SECTION ================= */
+.contact-section { margin-bottom: 120px; margin-top: 80px; }
+.contact-header { text-align: center; margin-bottom: 60px; }
+
+.contact-header h2 {
+    font-family: var(--font-serif); /* Playfair Display */
+    font-size: clamp(48px, 6vw, 80px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+}
+
+.contact-header p {
+    font-family: var(--font-body); /* Quicksand */
+    color: var(--gray-text);
+    font-size: 16px;
+    font-weight: 500;
+    max-width: 500px;
+    margin: 10px auto;
+}
+
+.contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: flex-start; }
+.contact-info { background-color: var(--gray-light); padding: 60px; border-radius: 24px; height: 100%; }
+
+.contact-info h3 {
+    font-family: var(--font-serif); /* Playfair Display */
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.info-block { margin-bottom: 32px; display: flex; gap: 20px; align-items: flex-start; }
+.info-block i { font-size: 24px; margin-top: 4px; }
+.info-block h4 { font-family: var(--font-heading); font-size: 14px; color: var(--gray-text); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.info-block p { font-family: var(--font-body); font-size: 16px; font-weight: 600; line-height: 1.5; }
+
+.contact-form { display: flex; flex-direction: column; gap: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+
+.form-group label { 
+    font-family: var(--font-body); /* Quicksand */
+    font-size: 13px; 
+    font-weight: 700; 
+    text-transform: uppercase;
+}
+
+.form-group input, .form-group textarea {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: var(--font-body); /* Quicksand */
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    transition: var(--transition);
+    background-color: var(--gray-light);
+}
+
+.form-group input:focus, .form-group textarea:focus { border-color: var(--black); background-color: var(--white); }
+.form-group textarea { resize: vertical; min-height: 160px; }
+
+.btn-submit {
+    padding: 18px 32px;
+    background-color: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font-body); /* Quicksand */
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 16px;
+}
+.btn-submit:hover { background-color: var(--gray-text); }
+
+/* ================= 8. VALUES SECTION ================= */
+.values-section { background-color: var(--black); color: var(--white); padding: 100px 0; margin-bottom: 80px; }
+.values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+.value-card h3 { font-family: var(--font-heading); font-size: 32px; margin-bottom: 16px; letter-spacing: 1px; }
+.value-card p { font-family: var(--font-body); color: #AAAAAA; font-size: 15px; font-weight: 500; line-height: 1.6; }
+.value-card i { font-size: 32px; margin-bottom: 24px; }
+
+/* ================= 9. FOOTER ================= */
+.footer-features { display: flex; justify-content: space-between; padding: 40px 0 60px; }
+.feature-item { font-family: var(--font-body); display: flex; align-items: center; gap: 12px; color: var(--black); font-size: 14px; font-weight: 700; transition: var(--transition); cursor: pointer; }
+.feature-item i { font-size: 20px; }
+.feature-item:hover { color: var(--gray-text); }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+    .hero, .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+    .hero-text { text-align: center; margin: 0 auto; }
+    .hero-text p { margin-left: auto; margin-right: auto; }
+    .btn-group { justify-content: center; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .collection-layout { grid-template-columns: repeat(2, 1fr); }
+    .carousel-next { display: none; }
+}
+
+@media (max-width: 768px) {
+    .nav-menu { display: none; }
+    .product-grid { grid-template-columns: 1fr; }
+    .values-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-features { flex-direction: column; align-items: center; gap: 24px; }
+}
+/* ================= FIX áº¢NH CONVERSE NHá»Ž -> PHÃ“NG TO ================= */
+
+/* 1. Khung card giá»¯ nguyÃªn */
+.product-card {
+    overflow: hidden;
+}
+
+/* 2. PHÃ“NG TO áº¢NH (QUAN TRá»ŒNG NHáº¤T) */
+.product-img {
+    width: 100%;
+    height: 260px;              /* tÄƒng khÃ´ng gian áº£nh */
+    object-fit: contain;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: scale(1.25);     /* PHÃ“NG TO áº£nh */
+    transition: transform 0.3s ease;
+}
+.conv-high {
+    transform: translateY(-20px);
+}
+/* 3. Hover cho giá»‘ng web xá»‹n */
+.product-card:hover .product-img {
+    transform: scale(1.2);
+}
+
+/* 4. Fix title Ä‘á»ƒ khÃ´ng lÃ m lá»‡ch layout */
+.card-title {
+    min-height: 48px;
+}
+
+/* 5. Giá»¯ nÃºt luÃ´n tháº³ng hÃ ng */
+.card-bottom {
+    margin-top: auto;
+}

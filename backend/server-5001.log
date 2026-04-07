@@ -1,0 +1,32 @@
+Connected to in-memory MongoDB.
+Product catalog is ready.
+Seeded admin account: admin@toxi.com
+Server running at http://localhost:5001
+[0mGET /products [32m200[0m 9.408 ms - 3018[0m
+[0mPOST /register [32m201[0m 74.086 ms - 350[0m
+[0mGET /products [32m200[0m 3.578 ms - 3018[0m
+[0mPUT /wishlist/69d4be0c259c4293c43384f9 [32m200[0m 17.412 ms - 1299[0m
+[0mPOST /cart [32m200[0m 8.998 ms - 638[0m
+[0mPOST /order [32m201[0m 13.826 ms - 529[0m
+[0mGET /orders [32m200[0m 4.071 ms - 492[0m
+[0mPOST /login [32m200[0m 60.266 ms - 333[0m
+[0mPOST /products [32m201[0m 5.654 ms - 421[0m
+[0mDELETE /products/69d4be2ce8b6479f398353be [32m200[0m 4.017 ms - 43[0m
+[0mGET /wishlist [32m200[0m 5.485 ms - 1299[0m
+[0mGET /cart [32m200[0m 3.277 ms - 41[0m
+[0mGET / [32m200[0m 2.131 ms - 25050[0m
+[0mGET /style.css [32m200[0m 2.832 ms - 30232[0m
+[0mGET /images/sneaker/mau1.png [32m200[0m 3.771 ms - 132404[0m
+[0mGET /images/sneaker/image%201.png [32m200[0m 3.630 ms - 239984[0m
+[0mGET /images/sneaker/bannervans.jpg [32m200[0m 3.762 ms - 107218[0m
+[0mGET /images/sneaker/bannercv.jpg [32m200[0m 2.817 ms - 8624[0m
+[0mGET /script.js [32m200[0m 2.608 ms - 49650[0m
+[0mGET /images/sneaker/mau2.png [32m200[0m 5.198 ms - 170646[0m
+[0mGET /products?sort=default [32m200[0m 3.515 ms - 3018[0m
+[0mGET /images/sneaker/convhigh.png [32m200[0m 3.404 ms - 39821[0m
+[0mGET /images/sneaker/convcollab.png [32m200[0m 3.510 ms - 44070[0m
+[0mGET /images/sneaker/vanshigh.png [32m200[0m 3.258 ms - 189987[0m
+[0mGET /images/sneaker/convlow.png [32m200[0m 4.386 ms - 123998[0m
+[0mGET /images/sneaker/download-removebg-preview.png [32m200[0m 3.194 ms - 155842[0m
+[0mGET /images/sneaker/vanscaro.png [32m200[0m 3.307 ms - 179740[0m
+[0mGET /favicon.ico [32m200[0m 1.687 ms - 25050[0m

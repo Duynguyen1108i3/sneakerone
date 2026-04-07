@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOXI - Minimalist Sneaker Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Climate+Crisis&family=Playfair+Display:wght@600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <div class="logo">TOXI</div>
+            <nav class="nav-menu">
+                <a href="#">HOME</a>
+                <span class="nav-separator">|</span>
+                <a href="#shop-section">SHOP</a>
+                <span class="nav-separator">|</span>
+                <a href="#new-arrivals-section">NEW ARRIVALS</a>
+                <span class="nav-separator">|</span>
+                <a href="#new-arrivals-section">BRANDS</a>
+                <span class="nav-separator">|</span>
+                <a href="#contact-section">CONTACT</a>
+            </nav>
+            <div class="header-icons">
+                <button class="header-icon-button" type="button" data-search-button aria-label="Search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button class="header-icon-button cart-toggle" type="button" aria-label="Open shopping cart">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="count-badge" data-cart-count>0</span>
+                </button>
+                <button class="header-icon-button" type="button" data-wishlist-button aria-label="Wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="count-badge count-badge-light" data-wishlist-count>0</span>
+                </button>
+                <button class="header-icon-button profile-toggle" type="button" aria-label="Account">
+                    <i class="fa-regular fa-circle-user"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero container">
+            <div class="hero-text">
+                <h1>STEP<br>INTO<br>YOUR<br>STYLE</h1>
+                <p>Explore the latest Vans and Converse sneakers built for style, comfort, and everyday street wear.</p>
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="#shop-section">Shop Now</a>
+                    <a class="btn btn-outline" href="#new-arrivals-section">View Collection <i class="fa-regular fa-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="images/sneaker/image 1.png" alt="Vans Old Skool">
+                <div class="hero-img-caption">* Vans Old Skool &ndash; Classic street style, timeless comfort. *</div>
+            </div>
+        </section>
+
+        <div class="container"><hr class="section-divider"></div>
+
+        <section id="shop-section" class="featured-section container">
+            <div class="section-header">
+                <h2>Featured Sneakers</h2>
+                <a href="#shop-section" class="explore-more">Explore More <i class="fa-solid fa-arrow-right-long" style="margin-left: 6px;"></i></a>
+            </div>
+
+            <div class="shop-toolbar">
+                <label class="search-shell" for="product-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="product-search" type="search" placeholder="Search for brand, name, or style..." data-search-input>
+                </label>
+
+                <div class="toolbar-selects">
+                    <label class="toolbar-select">
+                        <span>Sort</span>
+                        <select data-sort-select>
+                            <option value="default">Featured</option>
+                            <option value="newest">Newest</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="rating-desc">Top Rated</option>
+                        </select>
+                    </label>
+                    <label class="toolbar-select">
+                        <span>Rating</span>
+                        <select data-rating-select>
+                            <option value="0">All ratings</option>
+                            <option value="4">4.0+</option>
+                            <option value="4.5">4.5+</option>
+                            <option value="4.8">4.8+</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <button class="filter-chip active" type="button" data-filter="All">All</button>
+                <button class="filter-chip" type="button" data-filter="Vans">Vans</button>
+                <button class="filter-chip" type="button" data-filter="Converse">Converse</button>
+                <button class="filter-chip" type="button" data-filter="Wishlist">Favorites</button>
+            </div>
+
+            <div class="section-feedback" data-products-feedback hidden></div>
+
+            <div class="brand-group" data-category-group="Vans">
+                <div class="brand-subtitle">VANS</div>
+                <div class="carousel-wrapper">
+                    <div class="product-grid" id="vans-products"></div>
+                    <button class="carousel-next" type="button" aria-label="Next Vans products">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="brand-group" data-category-group="Converse">
+                <div class="brand-subtitle brand-subtitle-spaced">CONVERSE</div>
+                <div class="carousel-wrapper">
+                    <div class="product-grid" id="converse-products"></div>
+                    <button class="carousel-next" type="button" aria-label="Next Converse products">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="container"><hr class="section-divider"></div>
+
+        <section id="new-arrivals-section" class="best-collection container">
+            <h2>BEST SHOES COLLECTION</h2>
+            <div class="collection-layout">
+                <div class="model-wrapper">
+                    <img class="model-img-inner" src="images/sneaker/mau1.png" alt="Model Left" style="width: 800px; height: auto;">
+                </div>
+                <div class="pill-banner">
+                    <img src="images/sneaker/bannervans.jpg" alt="Promo Image" class="pill-bg-image">
+                    <div class="pill-overlay"></div>
+                    <h3>SIGN UP<br>&amp; GET<br>25% OFF</h3>
+                </div>
+                <div class="pill-banner">
+                    <img src="images/sneaker/bannercv.jpg" alt="Promo Image 2" class="pill-bg-image">
+                    <div class="pill-overlay"></div>
+                    <h3>SIGN UP<br>&amp; GET<br>25% OFF</h3>
+                </div>
+                <div class="model-wrapper">
+                    <img class="model-img-inner" src="images/sneaker/mau2.png" alt="Model Right">
+                </div>
+            </div>
+            <p class="best-collection-desc">Explore the latest Vans and Converse sneakers built for style,<br>comfort, and everyday street wear.</p>
+        </section>
+
+        <section id="contact-section" class="contact-section container">
+            <div class="contact-header">
+                <h2>LET'S TALK</h2>
+                <p>Have a question about your order, need sizing advice, or just want to chat about sneakers? We're here for you.</p>
+            </div>
+
+            <div class="contact-layout">
+                <div class="contact-info">
+                    <h3>GET IN TOUCH</h3>
+                    <div class="info-block">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <h4>Visit Us</h4>
+                            <p>123 Sneaker Avenue, District 1<br>Ho Chi Minh City, Vietnam</p>
+                        </div>
+                    </div>
+                    <div class="info-block">
+                        <i class="fa-solid fa-envelope"></i>
+                        <div>
+                            <h4>Email Us</h4>
+                            <p>trantxi@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="info-block">
+                        <i class="fa-solid fa-phone"></i>
+                        <div>
+                            <h4>Call Us</h4>
+                            <p>+84 111 111 111<br>Mon-Fri, 9am - 6pm</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="contact-form" id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fname">First Name</label>
+                            <input type="text" id="fname" placeholder="Tran">
+                        </div>
+                        <div class="form-group">
+                            <label for="lname">Last Name</label>
+                            <input type="text" id="lname" placeholder="Txi">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="tx@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" placeholder="How can we help?">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" placeholder="Write your message here..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="values-section">
+            <div class="container values-grid">
+                <div class="value-card">
+                    <i class="fa-solid fa-check-double"></i>
+                    <h3>100% AUTHENTIC</h3>
+                    <p>No fakes, no replicas. Every pair of sneakers that passes through TOXI is verified by our team of experts to ensure complete authenticity.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h3>CURATED SELECTION</h3>
+                    <p>We don't stock everything. We only stock the best. Our minimalist philosophy applies to our catalog as well as our design.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-solid fa-earth-americas"></i>
+                    <h3>GLOBAL CULTURE</h3>
+                    <p>Sneakers are a universal language. We aim to connect the local streetwear scene with global trends, bringing the world to your feet.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="footer-features container">
+            <div class="feature-item"><i class="fa-solid fa-cart-shopping"></i> Free Shipping</div>
+            <div class="feature-item"><i class="fa-solid fa-rotate-left"></i> Easy Return</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> Authentic Products</div>
+            <div class="feature-item"><i class="fa-regular fa-clock"></i> 24/7 Support</div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" data-auth-overlay></div>
+    <aside class="auth-modal" id="auth-modal" aria-hidden="true">
+        <div class="auth-modal-header">
+            <div>
+                <p class="auth-eyebrow">Account</p>
+                <h3>Member Access</h3>
+            </div>
+            <button class="icon-close" type="button" data-close-auth aria-label="Close account modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div data-auth-guest>
+            <div class="auth-tabs">
+                <button class="auth-tab active" type="button" data-auth-tab="login">Login</button>
+                <button class="auth-tab" type="button" data-auth-tab="register">Register</button>
+            </div>
+
+            <form class="auth-form" id="login-form" data-auth-form="login">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <button class="btn-submit" type="submit">Login</button>
+            </form>
+
+            <form class="auth-form is-hidden" id="register-form" data-auth-form="register">
+                <div class="form-group">
+                    <label for="register-name">Name</label>
+                    <input type="text" id="register-name" placeholder="Your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Create a password" required>
+                </div>
+                <button class="btn-submit" type="submit">Create Account</button>
+            </form>
+        </div>
+
+        <div class="is-hidden" data-auth-user>
+            <div class="profile-panel">
+                <div>
+                    <p class="auth-eyebrow">Logged In</p>
+                    <h4 data-user-name>User</h4>
+                    <p class="auth-meta" data-user-email>email@example.com</p>
+                    <p class="auth-meta" data-user-role>customer</p>
+                </div>
+                <button class="btn-secondary" type="button" data-logout-button>Logout</button>
+            </div>
+
+            <div class="profile-actions">
+                <button class="btn-secondary is-hidden" type="button" data-open-admin>Admin Panel</button>
+                <button class="btn-secondary" type="button" data-sync-wishlist>Sync Wishlist</button>
+            </div>
+
+            <div class="orders-panel">
+                <div class="orders-header">
+                    <h4>Recent Orders</h4>
+                    <button class="btn-secondary" type="button" data-refresh-orders>Refresh</button>
+                </div>
+                <div class="orders-list" data-orders-list></div>
+            </div>
+        </div>
+
+        <p class="auth-message" data-auth-message></p>
+    </aside>
+
+    <div class="cart-overlay" data-cart-overlay></div>
+    <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+        <div class="cart-drawer-header">
+            <div>
+                <p class="auth-eyebrow">Your Bag</p>
+                <h3>Shopping Cart</h3>
+            </div>
+            <button class="icon-close" type="button" data-close-cart aria-label="Close cart">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="cart-items" data-cart-items></div>
+
+        <div class="cart-summary">
+            <div class="cart-summary-row">
+                <span>Items</span>
+                <strong data-cart-items-total>0</strong>
+            </div>
+            <div class="cart-summary-row cart-summary-total">
+                <span>Total</span>
+                <strong data-cart-total>$0.00 USD</strong>
+            </div>
+            <p class="cart-summary-note" data-cart-note>Login to sync your cart and place an order.</p>
+            <button class="btn-submit" type="button" data-checkout-button>Checkout</button>
+        </div>
+    </aside>
+
+    <div class="modal-overlay" data-product-overlay></div>
+    <aside class="product-modal" id="product-modal" aria-hidden="true">
+        <div class="auth-modal-header">
+            <div>
+                <p class="auth-eyebrow">Product Detail</p>
+                <h3 data-product-modal-title>Select Your Pair</h3>
+            </div>
+            <button class="icon-close" type="button" data-close-product aria-label="Close product detail">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="product-detail-body" data-product-detail-body></div>
+    </aside>
+
+    <div class="modal-overlay" data-checkout-overlay></div>
+    <aside class="checkout-modal" id="checkout-modal" aria-hidden="true">
+        <div class="auth-modal-header">
+            <div>
+                <p class="auth-eyebrow">Secure Checkout</p>
+                <h3>Shipping &amp; Payment</h3>
+            </div>
+            <button class="icon-close" type="button" data-close-checkout aria-label="Close checkout">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form class="checkout-form" id="checkout-form">
+            <div class="form-group">
+                <label for="checkout-full-name">Full Name</label>
+                <input type="text" id="checkout-full-name" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-phone">Phone</label>
+                <input type="text" id="checkout-phone" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-line1">Address</label>
+                <input type="text" id="checkout-line1" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="checkout-city">City</label>
+                    <input type="text" id="checkout-city" required>
+                </div>
+                <div class="form-group">
+                    <label for="checkout-country">Country</label>
+                    <input type="text" id="checkout-country" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="checkout-postal-code">Postal Code</label>
+                <input type="text" id="checkout-postal-code" required>
+            </div>
+
+            <div class="payment-block">
+                <p class="payment-title">Payment Method</p>
+                <label class="payment-option">
+                    <input type="radio" name="payment-method" value="cash_on_delivery" checked>
+                    <span>Cash on delivery</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment-method" value="card">
+                    <span>Card</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment-method" value="bank_transfer">
+                    <span>Bank transfer</span>
+                </label>
+            </div>
+
+            <div class="checkout-summary-box">
+                <div class="cart-summary-row">
+                    <span>Items</span>
+                    <strong data-checkout-items-count>0</strong>
+                </div>
+                <div class="cart-summary-row cart-summary-total">
+                    <span>Total</span>
+                    <strong data-checkout-total>$0.00 USD</strong>
+                </div>
+            </div>
+
+            <button class="btn-submit" type="submit">Place Order</button>
+        </form>
+    </aside>
+
+    <div class="modal-overlay" data-admin-overlay></div>
+    <section class="admin-modal" id="admin-modal" aria-hidden="true">
+        <div class="auth-modal-header">
+            <div>
+                <p class="auth-eyebrow">Admin Dashboard</p>
+                <h3>Catalog Control</h3>
+            </div>
+            <button class="icon-close" type="button" data-close-admin aria-label="Close admin dashboard">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="admin-layout">
+            <form class="admin-form" id="admin-form">
+                <input type="hidden" id="admin-product-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-name">Product Name</label>
+                        <input type="text" id="admin-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-brand">Brand</label>
+                        <input type="text" id="admin-brand" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-category">Category</label>
+                        <select id="admin-category" required>
+                            <option value="Vans">Vans</option>
+                            <option value="Converse">Converse</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-price">Price</label>
+                        <input type="number" id="admin-price" min="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-image">Image URL</label>
+                    <input type="text" id="admin-image" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-description">Description</label>
+                    <textarea id="admin-description" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-colors">Colors (comma separated)</label>
+                        <input type="text" id="admin-colors" placeholder="Black, White">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-sizes">Sizes with stock</label>
+                        <input type="text" id="admin-sizes" placeholder="38:5, 39:4, 40:3" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-rating">Rating</label>
+                        <input type="number" id="admin-rating" min="0" max="5" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-reviews">Reviews</label>
+                        <input type="number" id="admin-reviews" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <div class="admin-switches">
+                    <label class="check-shell">
+                        <input type="checkbox" id="admin-featured">
+                        <span>Featured product</span>
+                    </label>
+                    <label class="check-shell">
+                        <input type="checkbox" id="admin-new-arrival">
+                        <span>New arrival</span>
+                    </label>
+                </div>
+
+                <div class="admin-actions">
+                    <button class="btn-submit" type="submit">Save Product</button>
+                    <button class="btn-secondary" type="button" data-reset-admin-form>Reset</button>
+                </div>
+            </form>
+
+            <div class="admin-list-wrap">
+                <div class="orders-header">
+                    <h4>Inventory</h4>
+                    <button class="btn-secondary" type="button" data-refresh-admin>Refresh</button>
+                </div>
+                <div class="admin-list" data-admin-products></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
