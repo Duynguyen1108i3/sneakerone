@@ -53,3 +53,18 @@ Change these values in `backend/.env` using `ADMIN_EMAIL` and `ADMIN_PASSWORD` i
 - The backend seeds the initial Vans and Converse products, plus a default admin account.
 - JWT token and client fallback wishlist state are stored in browser `localStorage`.
 - If port `5000` is already in use on your machine, set a different `PORT` value in `backend/.env`.
+
+## Deploy on Render
+
+This repo now includes [render.yaml](C:\Users\Lap4all\Downloads\WebSneaker\render.yaml).
+
+1. Push the whole project to GitHub
+2. In Render, choose **New +** -> **Blueprint**
+3. Connect your GitHub repo
+4. Render will read `render.yaml`
+5. Provide:
+   - `MONGODB_URI`: your MongoDB Atlas connection string
+   - `ADMIN_PASSWORD`: your admin password
+6. Deploy
+
+Important: keep the service running from the repo root. Do not set Render's Root Directory to `backend`, because this app serves the frontend from `../frontend`.
