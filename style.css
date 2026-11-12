@@ -454,3 +454,336 @@ header {
 .card-bottom {
     margin-top: auto;
 }
+
+/* ================= LABTHWEB MODAL ================= */
+body.panel-open {
+    overflow: hidden;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.36);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    z-index: 45;
+}
+
+.modal-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.labs-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: min(1040px, calc(100vw - 40px));
+    max-height: calc(100vh - 48px);
+    background: var(--white);
+    padding: 28px 26px 24px;
+    border-radius: 28px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.14);
+    z-index: 55;
+    transform: translate(-50%, -46%);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow: hidden;
+}
+
+.labs-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%);
+}
+
+.auth-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.auth-modal-header h3 {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.auth-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-text);
+    margin-bottom: 4px;
+}
+
+.icon-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #e6e6e6;
+    background: var(--white);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+.icon-close:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.labs-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lab-runtime-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--black);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.labs-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.search-shell.labs-search-shell {
+    flex: 1;
+    min-width: min(360px, 100%);
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: var(--gray-light);
+    border: 1px solid transparent;
+    transition: var(--transition);
+}
+
+.search-shell.labs-search-shell:focus-within {
+    border-color: var(--black);
+    background: var(--white);
+}
+
+.search-shell.labs-search-shell input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.labs-count-meta {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.labs-filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.labs-filter-row .filter-chip {
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #e6e6e6;
+    background: var(--white);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.labs-filter-row .filter-chip.active,
+.labs-filter-row .filter-chip:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.labs-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-right: 4px;
+}
+
+.lab-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lab-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.lab-group-header h4 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+.lab-group-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-text);
+}
+
+.lab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.lab-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: var(--gray-light);
+    border: 1px solid transparent;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.lab-card:hover {
+    background: var(--white);
+    border-color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.lab-card-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lab-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    word-break: break-word;
+}
+
+.lab-card-path {
+    font-size: 12px;
+    color: var(--gray-text);
+    word-break: break-all;
+}
+
+.lab-card-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.lab-ext-tag {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--white);
+    border: 1px solid #e6e6e6;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.lab-card:hover .lab-ext-tag {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.empty-state {
+    padding: 32px;
+    text-align: center;
+    color: var(--gray-text);
+}
+
+@media (max-width: 1024px) {
+    .lab-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .header-inner {
+        height: auto;
+        min-height: 80px;
+        padding: 16px 0;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .nav-menu {
+        display: flex;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+    }
+
+    .nav-menu a {
+        font-size: 13px;
+    }
+
+    .labs-modal {
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        padding: 20px 16px;
+    }
+
+    .lab-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -19,10 +19,16 @@ const orderRoutes = require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
+const {
+    scanLabDirectory,
+    startPhpServer,
+    stopPhpServer,
+    createLabMiddleware
+} = require("./utils/labServer");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const API_PREFIXES = ["/register", "/login", "/me", "/products", "/cart", "/order", "/orders", "/wishlist"];
+const API_PREFIXES = ["/api", "/register", "/login", "/me", "/products", "/cart", "/order", "/orders", "/wishlist"];
 
 let mongoServer;
 
@@ -195,18 +201,23 @@ async function seedAdminIfNeeded() {
 
 app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false }));
+app.use(morgan("dev"));
+app.use("/labth", createLabMiddleware());
 app.use(rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 250,
     standardHeaders: true,
     legacyHeaders: false
 }));
-app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/images", express.static(path.join(__dirname, "../frontend/images")));
 app.use(express.static(path.join(__dirname, "../frontend")));
+
+app.get("/api/labs", (req, res) => {
+    res.json(scanLabDirectory());
+});
 
 app.use(authRoutes);
 app.use(productRoutes);
@@ -233,11 +244,12 @@ app.use(errorHandler);
 
 async function startServer() {
     try {
+        startPhpServer();
         await connectDatabase();
         await seedProductsIfNeeded();
         await seedAdminIfNeeded();
 
-        app.listen(PORT, () => {
+        app.listen(PORT, "0.0.0.0", () => {
             console.log(`Server running at http://localhost:${PORT}`);
         });
     } catch (error) {
@@ -247,6 +259,7 @@ async function startServer() {
 }
 
 async function shutdown() {
+    stopPhpServer();
     await mongoose.connection.close();
 
     if (mongoServer) {

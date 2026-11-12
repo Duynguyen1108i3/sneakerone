@@ -29,6 +29,8 @@
                 <a href="#">BRANDS</a>
                 <span class="nav-separator">|</span>
                 <a href="#contact-section">CONTACT</a>
+                <span class="nav-separator">|</span>
+                <a href="#labthweb" class="nav-lab-link" data-open-labs>LABTHWEB</a>
             </nav>
             <div class="header-icons">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -275,5 +277,35 @@
         </section>
 
     </main>
+
+    <div class="modal-overlay" data-labs-overlay></div>
+    <section class="labs-modal" id="labs-modal" aria-hidden="true">
+        <div class="auth-modal-header">
+            <div>
+                <p class="auth-eyebrow">Thực Hành Web</p>
+                <div class="labs-title-row">
+                    <h3>LABTHWEB</h3>
+                    <span class="lab-runtime-badge" data-labs-status>PHP</span>
+                </div>
+            </div>
+            <button class="icon-close" type="button" data-close-labs aria-label="Close LABTHWEB">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="labs-toolbar">
+            <label class="search-shell labs-search-shell" for="labs-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="labs-search" type="search" placeholder="Tìm nhanh bài lab... (vd: lab3_1, lab8_4, bookstore)" data-labs-search>
+            </label>
+            <div class="labs-count-meta" data-labs-count>0 bài lab</div>
+        </div>
+
+        <div class="labs-filter-row" data-labs-filters></div>
+
+        <div class="labs-content" data-labs-content></div>
+    </section>
+
+    <script src="labthweb.js"></script>
 </body>
 </html>

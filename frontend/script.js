@@ -5,6 +5,120 @@ const STORAGE_KEYS = {
     wishlist: "websneaker-wishlist"
 };
 
+const DEFAULT_LAB_GROUPS = [
+    {
+        id: "lab01",
+        title: "Lab 01",
+        items: [
+            { name: "example01.php", path: "lab01/example01.php", ext: "php" },
+            { name: "lab1_3.php", path: "lab01/lab1_3.php", ext: "php" },
+            { name: "lab1_4.php", path: "lab01/lab1_4.php", ext: "php" },
+            { name: "vi_du_04 / example01.php", path: "lab01/vi_du_04/example01.php", ext: "php" },
+            { name: "vi_du_05 / bookstore / index.php", path: "lab01/vi_du_05/bookstore/index.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab02",
+        title: "Lab 02",
+        items: [
+            { name: "lab2_1a.html", path: "lab02/lab2_1a.html", ext: "html" },
+            { name: "lab2_1b.php", path: "lab02/lab2_1b.php", ext: "php" },
+            { name: "lab2_2.php", path: "lab02/lab2_2.php", ext: "php" },
+            { name: "lab2_3.php", path: "lab02/lab2_3.php", ext: "php" },
+            { name: "lab2_4.php", path: "lab02/lab2_4.php", ext: "php" },
+            { name: "lab2_5.php", path: "lab02/lab2_5.php", ext: "php" },
+            { name: "lab2_5a.php", path: "lab02/lab2_5a.php", ext: "php" },
+            { name: "lab2_5b.php", path: "lab02/lab2_5b.php", ext: "php" },
+            { name: "lab2_6.php", path: "lab02/lab2_6.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab03",
+        title: "Lab 03",
+        items: [
+            { name: "lab3_1.php", path: "lab03/lab3_1.php", ext: "php" },
+            { name: "lab3_2.php", path: "lab03/lab3_2.php", ext: "php" },
+            { name: "lab3_3.php", path: "lab03/lab3_3.php", ext: "php" },
+            { name: "lab3_4.php", path: "lab03/lab3_4.php", ext: "php" },
+            { name: "lab3_5.php", path: "lab03/lab3_5.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab04",
+        title: "Lab 04",
+        items: [
+            { name: "lab4_1.php", path: "lab04/lab4_1.php", ext: "php" },
+            { name: "lab4_2.php", path: "lab04/lab4_2.php", ext: "php" },
+            { name: "lab4_3.php", path: "lab04/lab4_3.php", ext: "php" },
+            { name: "lap4_4.php", path: "lab04/lap4_4.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab05",
+        title: "Lab 05",
+        items: [
+            { name: "lab5_1.php", path: "lab05/lab5_1.php", ext: "php" },
+            { name: "lab5_2.php", path: "lab05/lab5_2.php", ext: "php" },
+            { name: "lab5_3 / 1.php", path: "lab05/lab5_3/1.php", ext: "php" },
+            { name: "lab5_3 / 2.php", path: "lab05/lab5_3/2.php", ext: "php" },
+            { name: "lab5_4 / index.php", path: "lab05/lab5_4/index.php", ext: "php" },
+            { name: "lab5_4 / admin / index.php", path: "lab05/lab5_4/admin/index.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab06",
+        title: "Lab 06",
+        items: [
+            { name: "lab06_1.php", path: "lab06/lab06_1.php", ext: "php" },
+            { name: "lab06_2.php", path: "lab06/lab06_2.php", ext: "php" },
+            { name: "lab06_3.php", path: "lab06/lab06_3.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab08",
+        title: "Lab 08",
+        items: [
+            { name: "lab8_1.php", path: "lab08/lab8_1.php", ext: "php" },
+            { name: "lab8_2.php", path: "lab08/lab8_2.php", ext: "php" },
+            { name: "lab8_3.php", path: "lab08/lab8_3.php", ext: "php" },
+            { name: "lab8_31.php", path: "lab08/lab8_31.php", ext: "php" },
+            { name: "lab8_4 / index.php", path: "lab08/lab8_4/index.php", ext: "php" },
+            { name: "lab8_5 / index.php", path: "lab08/lab8_5/index.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab09",
+        title: "Lab 09",
+        items: [
+            { name: "lab9_1 / index.php", path: "lab09/lab9_1/index.php", ext: "php" },
+            { name: "lab9_2 / index.php", path: "lab09/lab9_2/index.php", ext: "php" },
+            { name: "lab9_2 / admins / index.html", path: "lab09/lab9_2/admins/index.html", ext: "html" },
+            { name: "lab9_3 / index.php", path: "lab09/lab9_3/index.php", ext: "php" },
+            { name: "lab9_4 / index.php", path: "lab09/lab9_4/index.php", ext: "php" },
+            { name: "lab9_4 / admins / index.php", path: "lab09/lab9_4/admins/index.php", ext: "php" }
+        ]
+    },
+    {
+        id: "lab10",
+        title: "Lab 10",
+        items: [
+            { name: "lab10_1 / index.php", path: "lab10/lab10_1/index.php", ext: "php" },
+            { name: "lab10_2 / index.php", path: "lab10/lab10_2/index.php", ext: "php" },
+            { name: "lab10_2 / admins / index.php", path: "lab10/lab10_2/admins/index.php", ext: "php" }
+        ]
+    },
+    {
+        id: "database",
+        title: "Database",
+        items: [
+            { name: "bookstore.sql", path: "database/bookstore.sql", ext: "sql" },
+            { name: "bookstore_vn.sql", path: "database/bookstore_vn.sql", ext: "sql" },
+            { name: "bookstore.png", path: "database/bookstore.png", ext: "png" },
+            { name: "bookstore_vn.png", path: "database/bookstore_vn.png", ext: "png" }
+        ]
+    }
+];
+
 const state = {
     products: [],
     filter: "All",
@@ -22,7 +136,12 @@ const state = {
     selectedProduct: null,
     selectedSize: "",
     selectedQuantity: 1,
-    adminProducts: []
+    adminProducts: [],
+    labGroups: DEFAULT_LAB_GROUPS,
+    labsFilter: "all",
+    labsSearch: "",
+    labsLoaded: false,
+    phpAvailable: true
 };
 
 const elements = {
@@ -72,7 +191,14 @@ const elements = {
     adminOverlay: document.querySelector("[data-admin-overlay]"),
     adminModal: document.getElementById("admin-modal"),
     adminForm: document.getElementById("admin-form"),
-    adminProducts: document.querySelector("[data-admin-products]")
+    adminProducts: document.querySelector("[data-admin-products]"),
+    labsOverlay: document.querySelector("[data-labs-overlay]"),
+    labsModal: document.getElementById("labs-modal"),
+    labsFilters: document.querySelector("[data-labs-filters]"),
+    labsContent: document.querySelector("[data-labs-content]"),
+    labsSearch: document.querySelector("[data-labs-search]"),
+    labsCount: document.querySelector("[data-labs-count]"),
+    labsStatus: document.querySelector("[data-labs-status]")
 };
 
 let toastTimer = null;
@@ -159,10 +285,11 @@ function syncBodyLock() {
         elements.cartDrawer,
         elements.productModal,
         elements.checkoutModal,
-        elements.adminModal
+        elements.adminModal,
+        elements.labsModal
     ];
 
-    const hasOpenPanel = openPanels.some((panel) => panel.classList.contains("is-open"));
+    const hasOpenPanel = openPanels.some((panel) => panel && panel.classList.contains("is-open"));
     document.body.classList.toggle("panel-open", hasOpenPanel);
 }
 
@@ -683,6 +810,136 @@ function closeAdminModal() {
     elements.adminOverlay.classList.remove("is-visible");
     elements.adminModal.classList.remove("is-open");
     elements.adminModal.setAttribute("aria-hidden", "true");
+    syncBodyLock();
+}
+
+function getLabBasePath() {
+    if (window.location.protocol === "file:" || window.location.pathname.includes("/frontend/")) {
+        return "../labth/";
+    }
+    return "/labth/";
+}
+
+function buildLabHref(relPath) {
+    const encoded = String(relPath || "")
+        .split("/")
+        .map((segment) => encodeURIComponent(segment))
+        .join("/");
+    return `${getLabBasePath()}${encoded}`;
+}
+
+function renderLabs() {
+    if (!elements.labsContent || !elements.labsFilters) {
+        return;
+    }
+
+    const groups = state.labGroups || [];
+    const totalAll = groups.reduce((sum, group) => sum + group.items.length, 0);
+
+    if (elements.labsStatus) {
+        elements.labsStatus.textContent = state.phpAvailable ? "PHP Ready" : "Source Preview";
+        elements.labsStatus.classList.toggle("is-fallback", !state.phpAvailable);
+    }
+
+    const filterButtons = [
+        `<button class="filter-chip ${state.labsFilter === "all" ? "active" : ""}" type="button" data-lab-filter="all">Tất cả (${totalAll})</button>`,
+        ...groups.map((group) => `
+            <button class="filter-chip ${state.labsFilter === group.id ? "active" : ""}" type="button" data-lab-filter="${escapeHtml(group.id)}">
+                ${escapeHtml(group.title)} (${group.items.length})
+            </button>
+        `)
+    ];
+    elements.labsFilters.innerHTML = filterButtons.join("");
+
+    const query = state.labsSearch.trim().toLowerCase();
+    const visibleGroups = groups
+        .filter((group) => state.labsFilter === "all" || group.id === state.labsFilter)
+        .map((group) => {
+            const matchedItems = group.items.filter((item) => {
+                if (!query) {
+                    return true;
+                }
+                return item.name.toLowerCase().includes(query)
+                    || item.path.toLowerCase().includes(query)
+                    || group.title.toLowerCase().includes(query);
+            });
+            return { ...group, items: matchedItems };
+        })
+        .filter((group) => group.items.length > 0);
+
+    const visibleCount = visibleGroups.reduce((sum, group) => sum + group.items.length, 0);
+    if (elements.labsCount) {
+        elements.labsCount.textContent = `${visibleCount} bài lab`;
+    }
+
+    if (!visibleGroups.length) {
+        elements.labsContent.innerHTML = createEmptyMarkup("Không tìm thấy bài lab phù hợp.");
+        return;
+    }
+
+    elements.labsContent.innerHTML = visibleGroups.map((group) => `
+        <section class="lab-group">
+            <div class="lab-group-header">
+                <h4>${escapeHtml(group.title)}</h4>
+                <span class="lab-group-count">${group.items.length} file</span>
+            </div>
+            <div class="lab-grid">
+                ${group.items.map((item) => `
+                    <a class="lab-card" href="${escapeHtml(buildLabHref(item.path))}" target="_blank" rel="noopener noreferrer">
+                        <div class="lab-card-info">
+                            <span class="lab-card-name">${escapeHtml(item.name)}</span>
+                            <span class="lab-card-path">labth/${escapeHtml(item.path)}</span>
+                        </div>
+                        <span class="lab-card-meta">
+                            <span class="lab-ext-tag">${escapeHtml(item.ext || "file")}</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </span>
+                    </a>
+                `).join("")}
+            </div>
+        </section>
+    `).join("");
+}
+
+async function loadLabs(force = false) {
+    if (state.labsLoaded && !force) {
+        renderLabs();
+        return;
+    }
+
+    try {
+        const data = await apiFetch("/api/labs");
+        if (Array.isArray(data.groups)) {
+            state.labGroups = data.groups;
+            state.phpAvailable = Boolean(data.phpAvailable);
+            state.labsLoaded = true;
+        }
+    } catch (error) {
+        state.labGroups = DEFAULT_LAB_GROUPS;
+        state.phpAvailable = window.location.protocol !== "file:";
+    }
+
+    renderLabs();
+}
+
+function openLabsModal() {
+    if (!elements.labsModal || !elements.labsOverlay) {
+        return;
+    }
+    elements.labsOverlay.classList.add("is-visible");
+    elements.labsModal.classList.add("is-open");
+    elements.labsModal.setAttribute("aria-hidden", "false");
+    syncBodyLock();
+    loadLabs();
+}
+
+function closeLabsModal() {
+    if (!elements.labsModal || !elements.labsOverlay) {
+        return;
+    }
+    elements.labsOverlay.classList.remove("is-visible");
+    elements.labsModal.classList.remove("is-open");
+    elements.labsModal.setAttribute("aria-hidden", "true");
     syncBodyLock();
 }
 
@@ -1267,6 +1524,22 @@ function bindEvents() {
             closeAdminModal();
         }
 
+        const openLabsTrigger = event.target.closest("[data-open-labs]");
+        if (openLabsTrigger) {
+            event.preventDefault();
+            openLabsModal();
+        }
+
+        if (event.target.closest("[data-close-labs]") || event.target.closest("[data-labs-overlay]")) {
+            closeLabsModal();
+        }
+
+        const labFilterBtn = event.target.closest("[data-lab-filter]");
+        if (labFilterBtn) {
+            state.labsFilter = labFilterBtn.dataset.labFilter;
+            renderLabs();
+        }
+
         if (event.target.closest("[data-search-button]")) {
             scrollToShop();
             elements.searchInput.focus();
@@ -1412,6 +1685,20 @@ function bindEvents() {
             closeProductModal();
             closeCheckoutModal();
             closeAdminModal();
+            closeLabsModal();
+        }
+    });
+
+    if (elements.labsSearch) {
+        elements.labsSearch.addEventListener("input", () => {
+            state.labsSearch = elements.labsSearch.value;
+            renderLabs();
+        });
+    }
+
+    window.addEventListener("hashchange", () => {
+        if (window.location.hash === "#labthweb") {
+            openLabsModal();
         }
     });
 
@@ -1448,6 +1735,10 @@ async function bootstrap() {
             logout();
             showToast("Your session expired. Please login again.");
         }
+    }
+
+    if (window.location.hash === "#labthweb") {
+        openLabsModal();
     }
 
     await loadProducts();

@@ -1,9 +1,9 @@
 services:
   - type: web
     name: websneaker
-    runtime: node
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /
     envVars:
       - key: PORT
