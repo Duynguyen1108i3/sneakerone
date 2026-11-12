@@ -486,13 +486,25 @@ function createWasmHandler(staticMiddleware, fallbackHandler) {
             delete requestHeaders["content-length"];
 
             const phpRes = await enqueueWasmTask(async () => {
-                const { handler } = await getOrCreateWasmContext();
-                return await handler.request({
-                    url: phpRequestUrl,
-                    method: req.method,
-                    headers: requestHeaders,
-                    body: body ? new Uint8Array(body) : undefined
-                });
+                try {
+                    const { php, handler } = await getOrCreateWasmContext();
+                    const dirPart = path.posix.dirname(toPosixRelative(targetFile));
+                    const vfsScriptDir = dirPart === "." ? "/labth" : `/labth/${dirPart}`;
+                    php.chdir(vfsScriptDir);
+                    const result = await handler.request({
+                        url: phpRequestUrl,
+                        method: req.method,
+                        headers: requestHeaders,
+                        body: body ? new Uint8Array(body) : undefined
+                    });
+                    if (result && result.httpStatusCode >= 500) {
+                        wasmContextPromise = null;
+                    }
+                    return result;
+                } catch (err) {
+                    wasmContextPromise = null;
+                    throw err;
+                }
             });
 
             const responseHeaders = {};
@@ -531,9 +543,7 @@ function createWasmHandler(staticMiddleware, fallbackHandler) {
             return res.end(Buffer.from(phpRes.bytes || []));
         } catch (error) {
             console.warn(`PHP-WASM fallback for ${toPosixRelative(targetFile)}:`, error.message || error.name || error);
-            if (!error || error.name !== "ErrnoError") {
-                wasmContextPromise = null;
-            }
+            wasmContextPromise = null;
             if (res.headersSent) {
                 return;
             }

@@ -817,6 +817,27 @@ function closeAdminModal() {
 
 const DIRECT_BROWSER_LAB_EXTS = new Set(["html", "htm", "png", "jpg", "jpeg", "gif", "svg", "webp", "pdf"]);
 
+const LAB_SUPPORT_FILES = [
+    "lab01/example01.php","lab01/lab1_3.php","lab01/lab1_4.php","lab01/vi_du_04/Error/404.html","lab01/vi_du_04/example01.php","lab01/vi_du_05/bookstore/config.php","lab01/vi_du_05/bookstore/index.php",
+    "lab02/lab2_1a.html","lab02/lab2_1b.php","lab02/lab2_2.php","lab02/lab2_3.php","lab02/lab2_4.php","lab02/lab2_5.php","lab02/lab2_5a.php","lab02/lab2_5b.php","lab02/lab2_6.php",
+    "lab03/lab3_1.php","lab03/lab3_2.php","lab03/lab3_3.php","lab03/lab3_4.php","lab03/lab3_5.php",
+    "lab04/lab4_1.php","lab04/lab4_2.php","lab04/lab4_3.php","lab04/lap4_4.php",
+    "lab05/lab5_1.php","lab05/lab5_2.php","lab05/lab5_3/1.php","lab05/lab5_3/2.php",
+    "lab05/lab5_4/admin/index.php","lab05/lab5_4/include/function.php","lab05/lab5_4/include/header.php","lab05/lab5_4/include/left.php","lab05/lab5_4/index.php","lab05/lab5_4/mod.php",
+    "lab05/lab5_4/module/index.php","lab05/lab5_4/module/info/gioithieu.php","lab05/lab5_4/module/info/index.php","lab05/lab5_4/module/info/lienhe.php","lab05/lab5_4/module/info/trangchu.php",
+    "lab05/lab5_4/module/product/index.php","lab05/lab5_4/module/product/product_catalog.php","lab05/lab5_4/module/product/product_press.php","lab05/lab5_4/module/product/search.php","lab05/lab5_4/module/product/spbc.php","lab05/lab5_4/module/product/spmoi.php",
+    "lab06/lab06_1.php","lab06/lab06_2.php","lab06/lab06_3.php",
+    "lab08/lab8_1.php","lab08/lab8_2.php","lab08/lab8_3.php","lab08/lab8_31.php",
+    "lab08/lab8_4/classes/Book.class.php","lab08/lab8_4/classes/Db.class.php","lab08/lab8_4/config/config.php","lab08/lab8_4/include/function.php","lab08/lab8_4/index.php",
+    "lab08/lab8_5/classes/Book.class.php","lab08/lab8_5/classes/Db.class.php","lab08/lab8_5/config/config.php","lab08/lab8_5/include/category.php","lab08/lab8_5/include/function.php","lab08/lab8_5/include/header.php","lab08/lab8_5/include/publisher.php","lab08/lab8_5/index.php","lab08/lab8_5/module/book/home.php","lab08/lab8_5/module/book/index.php","lab08/lab8_5/module/book/list.php","lab08/lab8_5/module/news/index.php",
+    "lab09/lab9_1/classes/Book.class.php","lab09/lab9_1/classes/Db.class.php","lab09/lab9_1/config/config.php","lab09/lab9_1/include/category.php","lab09/lab9_1/include/function.php","lab09/lab9_1/include/header.php","lab09/lab9_1/include/publisher.php","lab09/lab9_1/index.php","lab09/lab9_1/module/book/home.php","lab09/lab9_1/module/book/index.php","lab09/lab9_1/module/book/list.php","lab09/lab9_1/module/news/index.php",
+    "lab09/lab9_2/admins/index.html","lab09/lab9_2/admins/login.html","lab09/lab9_2/classes/Book.class.php","lab09/lab9_2/classes/Db.class.php","lab09/lab9_2/config/config.php","lab09/lab9_2/include/category.php","lab09/lab9_2/include/function.php","lab09/lab9_2/include/header.php","lab09/lab9_2/include/publisher.php","lab09/lab9_2/index.php","lab09/lab9_2/module/book/home.php","lab09/lab9_2/module/book/index.php","lab09/lab9_2/module/book/list.php","lab09/lab9_2/module/news/index.php",
+    "lab09/lab9_3/classes/Book.class.php","lab09/lab9_3/classes/Cart.class.php","lab09/lab9_3/classes/Db.class.php","lab09/lab9_3/config/config.php","lab09/lab9_3/include/category.php","lab09/lab9_3/include/function.php","lab09/lab9_3/include/header.php","lab09/lab9_3/include/publisher.php","lab09/lab9_3/index.php","lab09/lab9_3/mod.php","lab09/lab9_3/module/book/home.php","lab09/lab9_3/module/book/index.php","lab09/lab9_3/module/book/list.php","lab09/lab9_3/module/cart/index.php","lab09/lab9_3/module/news/index.php",
+    "lab09/lab9_4/admins/index.php","lab09/lab9_4/admins/login.html","lab09/lab9_4/admins/mod.php","lab09/lab9_4/admins/module/book/bookshow.php","lab09/lab9_4/admins/module/book/catedit.php","lab09/lab9_4/admins/module/book/catshow.php","lab09/lab9_4/admins/module/book/index.php","lab09/lab9_4/classes/Book.class.php","lab09/lab9_4/classes/Cart.class.php","lab09/lab9_4/classes/Category.class.php","lab09/lab9_4/classes/Db.class.php","lab09/lab9_4/classes/Utils.class.php","lab09/lab9_4/config/config.php","lab09/lab9_4/include/category.php","lab09/lab9_4/include/function.php","lab09/lab9_4/include/header.php","lab09/lab9_4/include/publisher.php","lab09/lab9_4/index.php","lab09/lab9_4/mod.php","lab09/lab9_4/module/book/home.php","lab09/lab9_4/module/book/index.php","lab09/lab9_4/module/book/list.php","lab09/lab9_4/module/book/search.php","lab09/lab9_4/module/cart/index.php","lab09/lab9_4/module/news/index.php",
+    "lab10/lab10_1/classes/Book.class.php","lab10/lab10_1/classes/Db.class.php","lab10/lab10_1/config/config.php","lab10/lab10_1/include/category.php","lab10/lab10_1/include/function.php","lab10/lab10_1/include/header.php","lab10/lab10_1/include/publisher.php","lab10/lab10_1/index.php","lab10/lab10_1/lib/PHPMailer/PHPMailerAutoload.php","lab10/lab10_1/lib/PHPMailer/class.phpmailer.php","lab10/lab10_1/lib/PHPMailer/class.smtp.php","lab10/lab10_1/module/book/home.php","lab10/lab10_1/module/book/index.php","lab10/lab10_1/module/book/list.php","lab10/lab10_1/module/news/index.php","lab10/lab10_1/module/user/index.php",
+    "lab10/lab10_2/admins/index.php","lab10/lab10_2/admins/login.html","lab10/lab10_2/admins/mod.php","lab10/lab10_2/admins/module/book/bookshow.php","lab10/lab10_2/admins/module/book/catedit.php","lab10/lab10_2/admins/module/book/catshow.php","lab10/lab10_2/admins/module/book/index.php","lab10/lab10_2/admins/module/news/index.php","lab10/lab10_2/classes/Book.class.php","lab10/lab10_2/classes/Cart.class.php","lab10/lab10_2/classes/Category.class.php","lab10/lab10_2/classes/Db.class.php","lab10/lab10_2/classes/News.class.php","lab10/lab10_2/classes/Utils.class.php","lab10/lab10_2/config/config.php","lab10/lab10_2/include/category.php","lab10/lab10_2/include/function.php","lab10/lab10_2/include/header.php","lab10/lab10_2/include/publisher.php","lab10/lab10_2/index.php","lab10/lab10_2/lib/PHPMailer/PHPMailerAutoload.php","lab10/lab10_2/lib/PHPMailer/class.phpmailer.php","lab10/lab10_2/lib/PHPMailer/class.smtp.php","lab10/lab10_2/module/book/home.php","lab10/lab10_2/module/book/index.php","lab10/lab10_2/module/book/list.php","lab10/lab10_2/module/news/index.php","lab10/lab10_2/module/user/index.php"
+];
+
 function getLabBasePath() {
     if (state.labServerActive) {
         return `${state.labServerBase}/labth/`;
@@ -824,7 +845,7 @@ function getLabBasePath() {
     if (window.location.protocol === "file:" || window.location.pathname.includes("/frontend/")) {
         return "../labth/";
     }
-    return "/labth/";
+    return "labth/";
 }
 
 function serializeJsonForHtmlScript(value) {
@@ -850,12 +871,39 @@ function computeLabRootUrl(resolvedUrl, relPath) {
     return new URL(prefix, resolvedUrl).href;
 }
 
+function collectSubLabCandidates(entryRelPath) {
+    const parts = String(entryRelPath || "").split("/").filter(Boolean);
+    if (parts.length >= 3) {
+        const prefix = `${parts[0]}/${parts[1]}/`;
+        return LAB_SUPPORT_FILES.filter((item) => item.startsWith(prefix));
+    }
+    if (parts.length === 2) {
+        const prefix = `${parts[0]}/`;
+        return LAB_SUPPORT_FILES.filter((item) => item.startsWith(prefix) && !item.slice(prefix.length).includes("/"));
+    }
+    return [];
+}
+
+function isBinaryMediaContentType(contentType) {
+    const ct = String(contentType || "").toLowerCase().split(";")[0].trim();
+    if (!ct) {
+        return false;
+    }
+    if (/^(?:image|video|audio|font)\//.test(ct)) {
+        return true;
+    }
+    return ct === "application/pdf"
+        || ct === "application/zip"
+        || ct === "application/x-gzip"
+        || ct === "application/x-shockwave-flash";
+}
+
 function resolveLabRelativeRef(currentRelPath, ref, labRootUrl) {
     if (!ref || /^(?:https?:|mailto:|tel:|javascript:|#|\/\/)/i.test(ref)) {
         return null;
     }
     const cleanRef = String(ref).split(/[?#]/)[0].trim();
-    if (!cleanRef || !/\.php$/i.test(cleanRef)) {
+    if (!cleanRef || !/\.(?:php|html?)$/i.test(cleanRef)) {
         return null;
     }
     try {
@@ -873,8 +921,8 @@ function resolveLabRelativeRef(currentRelPath, ref, labRootUrl) {
 function extractPhpDependencyRefs(source) {
     const refs = new Set();
     const text = String(source || "");
-    const includeRegex = /(?:include|include_once|require|require_once)\s*\(?\s*["']([^"'$\r\n]+?\.php)["']/gi;
-    const attrRegex = /(?:action|href)\s*=\s*["']([^"'$?\r\n:]+?\.php(?:\?[^"']*)?)["']/gi;
+    const includeRegex = /(?:include|include_once|require|require_once)\s*\(?\s*["']([^"'$\r\n<>]+?\.(?:php|html?))["']/gi;
+    const attrRegex = /(?:action|href)\s*=\s*["']([^"'$?\r\n:]+?\.(?:php|html?)(?:\?[^"']*)?)["']/gi;
     let match;
     while ((match = includeRegex.exec(text)) !== null) {
         refs.add(match[1]);
@@ -889,8 +937,49 @@ async function preloadPhpLabFiles(entryRelPath, entrySource, labRootUrl) {
     const files = { [entryRelPath]: entrySource };
     const visited = new Set([entryRelPath]);
     const queue = [{ relPath: entryRelPath, source: entrySource, depth: 0 }];
-    const MAX_FILES = 24;
+    const MAX_FILES = 64;
     const MAX_DEPTH = 3;
+
+    async function fetchPendingBatch(pendingList) {
+        const batchSize = 12;
+        const results = [];
+        for (let i = 0; i < pendingList.length; i += batchSize) {
+            const slice = pendingList.slice(i, i + batchSize);
+            const chunk = await Promise.all(slice.map(async (rel) => {
+                try {
+                    const res = await fetch(`${labRootUrl}${encodeLabRelPath(rel)}`);
+                    if (!res.ok) {
+                        return null;
+                    }
+                    if (isBinaryMediaContentType(res.headers.get("content-type"))) {
+                        return null;
+                    }
+                    return { rel, text: await res.text() };
+                } catch (error) {
+                    return null;
+                }
+            }));
+            results.push(...chunk);
+        }
+        return results;
+    }
+
+    const subLabPending = [];
+    for (const rel of collectSubLabCandidates(entryRelPath)) {
+        if (!visited.has(rel) && subLabPending.length + 1 < MAX_FILES) {
+            visited.add(rel);
+            subLabPending.push(rel);
+        }
+    }
+    if (subLabPending.length) {
+        const fetched = await fetchPendingBatch(subLabPending);
+        for (const item of fetched) {
+            if (item && Object.keys(files).length < MAX_FILES) {
+                files[item.rel] = item.text;
+                queue.push({ relPath: item.rel, source: item.text, depth: 1 });
+            }
+        }
+    }
 
     while (queue.length > 0 && Object.keys(files).length < MAX_FILES) {
         const current = queue.shift();
@@ -913,21 +1002,7 @@ async function preloadPhpLabFiles(entryRelPath, entrySource, labRootUrl) {
         if (!pending.length) {
             continue;
         }
-        const fetched = await Promise.all(pending.map(async (rel) => {
-            try {
-                const res = await fetch(`${labRootUrl}${encodeLabRelPath(rel)}`);
-                if (!res.ok) {
-                    return null;
-                }
-                const ct = String(res.headers.get("content-type") || "").toLowerCase();
-                if (ct.includes("image/") || ct.includes("octet-stream")) {
-                    return null;
-                }
-                return { rel, text: await res.text() };
-            } catch (error) {
-                return null;
-            }
-        }));
+        const fetched = await fetchPendingBatch(pending);
         for (const item of fetched) {
             if (item && Object.keys(files).length < MAX_FILES) {
                 files[item.rel] = item.text;
@@ -1100,7 +1175,7 @@ function buildLabPreviewHtml(relPath, rawUrl, source, ext, preloadedFiles = null
                 "var method=(form.getAttribute('method')||'GET').toUpperCase();" +
                 "var enctype=(form.getAttribute('enctype')||'').toLowerCase();" +
                 "var fd=new FormData(form);" +
-                "if(e.submitter&&e.submitter.name){fd.append(e.submitter.name,e.submitter.value||'');}" +
+                "if(e.submitter&&e.submitter.name&&!fd.has(e.submitter.name)){fd.append(e.submitter.name,e.submitter.value||'');}" +
                 "var fields=[];" +
                 "for(var pair of fd.entries()){" +
                 "var k=pair[0],v=pair[1];" +
@@ -1130,37 +1205,29 @@ function buildLabPreviewHtml(relPath, rawUrl, source, ext, preloadedFiles = null
         }
 
         async function runBrowserPhp() {
+            let PHP;
+            let PHPRequestHandler;
+            let loadPHPRuntime;
+            let getPHPLoaderModule;
+            let variant;
+            let variantBase;
             let php;
             let handler;
+            let runtimeDirty = false;
             const written = new Set();
 
             function ensureFileInVfs(relPath, content) {
-                const full = "/labth/" + relPath;
+                const normalized = String(relPath || "").replace(/^\\/+/, "");
+                const full = "/labth/" + normalized;
                 const slash = full.lastIndexOf("/");
                 if (slash > 0) {
                     php.mkdirTree(full.slice(0, slash));
                 }
                 php.writeFile(full, content);
-                written.add(relPath);
+                written.add(normalized);
             }
 
-            async function ensurePathFetched(relPath) {
-                if (written.has(relPath)) return;
-                const encoded = relPath.split("/").filter(Boolean).map(encodeURIComponent).join("/");
-                const res = await fetch(config.labRootUrl + encoded);
-                if (!res.ok) throw new Error("HTTP " + res.status);
-                const text = await res.text();
-                config.files[relPath] = text;
-                ensureFileInVfs(relPath, text);
-            }
-
-            try {
-                const [{ PHP, PHPRequestHandler, loadPHPRuntime }, { getPHPLoaderModule, jspi }] = await Promise.all([
-                    import("https://cdn.jsdelivr.net/npm/@php-wasm/universal@3.1.64/+esm"),
-                    import("https://cdn.jsdelivr.net/npm/@php-wasm/web-8-3@3.1.64/+esm")
-                ]);
-                const variant = (await jspi()) ? "jspi" : "asyncify";
-                const variantBase = "https://cdn.jsdelivr.net/npm/@php-wasm/web-8-3@3.1.64/" + variant + "/";
+            async function createPhpRuntime() {
                 const loader = await getPHPLoaderModule();
                 const runtimeId = await loadPHPRuntime(loader, {
                     locateFile(file) {
@@ -1170,35 +1237,82 @@ function buildLabPreviewHtml(relPath, rawUrl, source, ext, preloadedFiles = null
                     }
                 });
                 php = new PHP(runtimeId);
+                written.clear();
                 for (const [rel, text] of Object.entries(config.files || {})) {
                     ensureFileInVfs(rel, text);
+                }
+                if (String(config.entryRelPath || "").startsWith("lab05/lab5_3/")) {
+                    php.mkdirTree("/labth/lab05/lab5_3/image");
                 }
                 handler = new PHPRequestHandler({
                     php,
                     documentRoot: "/labth",
                     absoluteUrl: "http://127.0.0.1"
                 });
+                runtimeDirty = false;
+            }
+
+            async function ensurePathFetched(relPath) {
+                const normalized = String(relPath || "").replace(/^\\/+/, "");
+                if (written.has(normalized)) return normalized;
+                const encoded = normalized.split("/").filter(Boolean).map(encodeURIComponent).join("/");
+                const res = await fetch(config.labRootUrl + encoded);
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const text = await res.text();
+                config.files[normalized] = text;
+                ensureFileInVfs(normalized, text);
+                if (normalized.startsWith("lab05/lab5_3/")) {
+                    php.mkdirTree("/labth/lab05/lab5_3/image");
+                }
+                return normalized;
+            }
+
+            try {
+                ([{ PHP, PHPRequestHandler, loadPHPRuntime }, { getPHPLoaderModule, jspi }] = await Promise.all([
+                    import("https://cdn.jsdelivr.net/npm/@php-wasm/universal@3.1.64/+esm"),
+                    import("https://cdn.jsdelivr.net/npm/@php-wasm/web-8-3@3.1.64/+esm")
+                ]));
+                variant = (await jspi()) ? "jspi" : "asyncify";
+                variantBase = "https://cdn.jsdelivr.net/npm/@php-wasm/web-8-3@3.1.64/" + variant + "/";
+                await createPhpRuntime();
 
                 async function executeRequest(relPath, queryString = "", method = "GET", headers = {}, body = undefined, hop = 0) {
-                    await ensurePathFetched(relPath);
-                    if (activeFileEl) activeFileEl.textContent = "labth/" + relPath;
-                    if (sourceCodeEl && config.files[relPath]) sourceCodeEl.textContent = config.files[relPath];
+                    if (runtimeDirty || !php || !handler) {
+                        await createPhpRuntime();
+                    }
+                    const normalizedRel = await ensurePathFetched(relPath);
+                    if (activeFileEl) activeFileEl.textContent = "labth/" + normalizedRel;
+                    if (sourceCodeEl && config.files[normalizedRel]) sourceCodeEl.textContent = config.files[normalizedRel];
 
-                    const res = await handler.request({
-                        url: "/" + relPath + queryString,
-                        method,
-                        headers,
-                        body
-                    });
+                    const lastSlash = normalizedRel.lastIndexOf("/");
+                    const vfsDir = lastSlash > 0 ? "/labth/" + normalizedRel.slice(0, lastSlash) : "/labth";
+                    php.mkdirTree(vfsDir);
+                    php.chdir(vfsDir);
+
+                    let res;
+                    try {
+                        res = await handler.request({
+                            url: "/" + normalizedRel + queryString,
+                            method,
+                            headers,
+                            body
+                        });
+                    } catch (err) {
+                        runtimeDirty = true;
+                        throw err;
+                    }
                     const status = res.httpStatusCode || 200;
+                    if (status >= 500) {
+                        runtimeDirty = true;
+                    }
                     const resHeaders = res.headers || {};
                     let location = resHeaders.location || resHeaders.Location || "";
                     if (Array.isArray(location)) location = location[0] || "";
                     if (status >= 300 && status < 400 && !location) {
-                        location = extractRedirectLoc(config.files[relPath]);
+                        location = extractRedirectLoc(config.files[normalizedRel]);
                     }
                     if (status >= 300 && status < 400 && location && hop < 5) {
-                        const curUrl = new URL(relPath.split("/").map(encodeURIComponent).join("/"), config.labRootUrl);
+                        const curUrl = new URL(normalizedRel.split("/").map(encodeURIComponent).join("/"), config.labRootUrl);
                         const nextUrl = new URL(location.replace(/^http:\\/\\/127\\.0\\.0\\.1/, ""), curUrl);
                         if (nextUrl.href.startsWith(config.labRootUrl)) {
                             const nextPathAndQuery = nextUrl.href.slice(config.labRootUrl.length);
@@ -1213,10 +1327,10 @@ function buildLabPreviewHtml(relPath, rawUrl, source, ext, preloadedFiles = null
                     if (loadingBoxEl) loadingBoxEl.classList.add("is-hidden");
                     if (outputFrame) {
                         outputFrame.classList.remove("is-hidden");
-                        outputFrame.srcdoc = buildOutputSrcdoc(text, relPath);
+                        outputFrame.srcdoc = buildOutputSrcdoc(text, normalizedRel);
                     }
                     setNotice(
-                        "Đã chạy PHP trực tiếp: labth/" + relPath,
+                        "Đã chạy PHP trực tiếp: labth/" + normalizedRel,
                         "Đang thực thi bằng PHP 8.3 WebAssembly trực tiếp trên trình duyệt (HTTP " + status + ")."
                     );
                 }
