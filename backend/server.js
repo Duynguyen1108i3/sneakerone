@@ -1,3 +1,5 @@
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 require("dotenv").config();
 
 const bcrypt = require("bcryptjs");
@@ -7,7 +9,6 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
-const path = require("path");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 
 const Product = require("./models/Product");
