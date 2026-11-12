@@ -1209,6 +1209,7 @@ function buildLabPreviewHtml(relPath, rawUrl, source, ext, preloadedFiles = null
             let PHPRequestHandler;
             let loadPHPRuntime;
             let getPHPLoaderModule;
+            let jspi;
             let variant;
             let variantBase;
             let php;

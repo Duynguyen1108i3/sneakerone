@@ -527,6 +527,7 @@ const LAB_SUPPORT_FILES = [
             let PHPRequestHandler;
             let loadPHPRuntime;
             let getPHPLoaderModule;
+            let jspi;
             let variant;
             let variantBase;
             let php;
