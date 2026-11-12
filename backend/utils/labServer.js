@@ -1,4 +1,4 @@
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const express = require("express");
 const fs = require("fs");
 const http = require("http");
@@ -32,7 +32,46 @@ const IGNORED_SUBDIRS = new Set([
 
 let phpProcess = null;
 let phpAvailable = true;
+let phpMode = "native";
+let phpModeChecked = false;
 let isShuttingDown = false;
+let wasmContextPromise = null;
+let wasmQueue = Promise.resolve();
+
+function hasWasmRuntimePackages() {
+    try {
+        require.resolve("@php-wasm/universal");
+        require.resolve("@php-wasm/node-8-3");
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+function detectPhpModeSync() {
+    if (phpModeChecked) {
+        return phpMode;
+    }
+    phpModeChecked = true;
+
+    const probe = spawnSync("php", ["-v"], { stdio: "ignore", timeout: 1500 });
+    if (!probe.error && probe.status === 0) {
+        phpMode = "native";
+        phpAvailable = true;
+        return phpMode;
+    }
+
+    if (hasWasmRuntimePackages()) {
+        phpMode = "wasm";
+        phpAvailable = true;
+        console.log("PHP CLI not found; using built-in PHP 8.3 WebAssembly runtime for /labth.");
+    } else {
+        phpMode = "preview";
+        phpAvailable = false;
+        console.warn("PHP CLI not found; /labth will fall back to static/source preview mode.");
+    }
+    return phpMode;
+}
 
 function naturalCompare(a, b) {
     return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
@@ -148,8 +187,10 @@ function scanLabSubdir(dirPath, groupFolder, depth, items) {
 }
 
 function scanLabDirectory() {
+    detectPhpModeSync();
+
     if (!fs.existsSync(LABTH_DIR)) {
-        return { serverMode: "express", phpAvailable, groups: [] };
+        return { serverMode: "express", phpAvailable, phpMode, groups: [] };
     }
 
     const entries = fs.readdirSync(LABTH_DIR, { withFileTypes: true });
@@ -215,6 +256,7 @@ function scanLabDirectory() {
     return {
         serverMode: "express",
         phpAvailable,
+        phpMode,
         groups
     };
 }
@@ -225,6 +267,10 @@ function startPhpServer() {
     }
 
     if (!fs.existsSync(LABTH_DIR)) {
+        return;
+    }
+
+    if (detectPhpModeSync() !== "native") {
         return;
     }
 
@@ -259,8 +305,15 @@ function startPhpServer() {
     child.on("error", (error) => {
         phpProcess = null;
         if (error.code === "ENOENT") {
-            phpAvailable = false;
-            console.warn("PHP CLI not found; /labth will fall back to static/source preview mode.");
+            if (hasWasmRuntimePackages()) {
+                phpMode = "wasm";
+                phpAvailable = true;
+                console.log("PHP CLI not found; using built-in PHP 8.3 WebAssembly runtime for /labth.");
+            } else {
+                phpMode = "preview";
+                phpAvailable = false;
+                console.warn("PHP CLI not found; /labth will fall back to static/source preview mode.");
+            }
             return;
         }
         console.error("Failed to start PHP server:", error.message);
@@ -270,7 +323,7 @@ function startPhpServer() {
         if (phpProcess === child) {
             phpProcess = null;
         }
-        if (!isShuttingDown && phpAvailable && code !== 0) {
+        if (!isShuttingDown && phpAvailable && phpMode === "native" && code !== 0) {
             console.warn(`PHP server exited with code ${code}; restarting...`);
             setTimeout(startPhpServer, 1000);
         }
@@ -283,10 +336,220 @@ function stopPhpServer() {
         phpProcess.kill("SIGTERM");
         phpProcess = null;
     }
+    wasmContextPromise = null;
+}
+
+function copyLabFilesToWasm(php, hostDir, vfsDir) {
+    php.mkdirTree(vfsDir);
+    const entries = fs.readdirSync(hostDir, { withFileTypes: true });
+    for (const entry of entries) {
+        if (entry.name.startsWith(".") && entry.name !== ".htaccess") {
+            continue;
+        }
+        const src = path.join(hostDir, entry.name);
+        const dst = `${vfsDir}/${entry.name}`;
+        if (entry.isDirectory()) {
+            copyLabFilesToWasm(php, src, dst);
+        } else if (entry.isFile() && /\.(php|html?|sql|txt|md|log|htaccess)$/i.test(entry.name)) {
+            php.writeFile(dst, fs.readFileSync(src));
+        }
+    }
+}
+
+async function getOrCreateWasmContext() {
+    if (!wasmContextPromise) {
+        wasmContextPromise = (async () => {
+            const { PHP, PHPRequestHandler, loadPHPRuntime } = require("@php-wasm/universal");
+            const { getPHPLoaderModule, jspi } = require("@php-wasm/node-8-3");
+            const pkgDir = path.dirname(require.resolve("@php-wasm/node-8-3/package.json"));
+            const variant = (await jspi()) ? "jspi" : "asyncify";
+            const loader = await getPHPLoaderModule();
+            const runtimeId = await loadPHPRuntime(loader, {
+                locateFile(file) {
+                    const raw = String(file || "");
+                    if (path.isAbsolute(raw) && fs.existsSync(raw)) {
+                        return raw;
+                    }
+                    return path.join(pkgDir, variant, raw.replace(/^\//, ""));
+                }
+            });
+            const php = new PHP(runtimeId);
+            copyLabFilesToWasm(php, LABTH_DIR, "/labth");
+            const handler = new PHPRequestHandler({
+                php,
+                documentRoot: "/labth",
+                absoluteUrl: "http://127.0.0.1",
+                cookieStore: false
+            });
+            return { php, handler };
+        })().catch((error) => {
+            wasmContextPromise = null;
+            throw error;
+        });
+    }
+    return wasmContextPromise;
+}
+
+function collectRequestBody(req) {
+    if (!["POST", "PUT", "PATCH", "DELETE"].includes(req.method) || req.readableEnded) {
+        return Promise.resolve(undefined);
+    }
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+        req.on("data", (chunk) => chunks.push(chunk));
+        req.on("end", () => resolve(chunks.length ? Buffer.concat(chunks) : undefined));
+        req.on("error", reject);
+    });
+}
+
+function extractInlineRedirectLocation(filePath) {
+    try {
+        const source = fs.readFileSync(filePath, "utf8");
+        const match = /header\s*\(\s*["']location\s*:\s*([^"'\r\n]+)["']\s*\)/i.exec(source);
+        return match ? match[1].trim() : "";
+    } catch (error) {
+        return "";
+    }
+}
+
+function enqueueWasmTask(task) {
+    const run = wasmQueue.then(task, task);
+    wasmQueue = run.catch(() => {});
+    return run;
+}
+
+function createWasmHandler(staticMiddleware, fallbackHandler) {
+    return async (req, res, next) => {
+        let decodedPath = "/";
+        try {
+            decodedPath = decodeURIComponent(req.path);
+        } catch (error) {
+            return res.status(400).send("Invalid path.");
+        }
+
+        const resolvedPath = path.resolve(LABTH_DIR, `.${decodedPath}`);
+        if (resolvedPath !== LABTH_DIR && !resolvedPath.startsWith(LABTH_DIR + path.sep)) {
+            return res.status(403).send("Forbidden");
+        }
+
+        let targetFile = resolvedPath;
+        let phpRequestUrl = req.url;
+        if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isDirectory()) {
+            if (!req.path.endsWith("/")) {
+                const qs = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+                return res.redirect(302, `${req.baseUrl}${req.path}/${qs}`);
+            }
+
+            const indexFile = findIndexEntry(resolvedPath);
+            if (!indexFile) {
+                const entries = fs.readdirSync(resolvedPath, { withFileTypes: true })
+                    .filter((entry) => !entry.name.startsWith("."))
+                    .sort((a, b) => naturalCompare(a.name, b.name));
+                const listItems = entries.map((entry) => {
+                    const suffix = entry.isDirectory() ? "/" : "";
+                    return `<li><a href="${escapeHtml(encodeURIComponent(entry.name) + suffix)}">${escapeHtml(entry.name + suffix)}</a></li>`;
+                }).join("");
+                res.setHeader("Content-Disposition", "inline");
+                return res.status(200).type("html").send(`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>labth${escapeHtml(decodedPath)}</title><style>body{font-family:system-ui,sans-serif;max-width:860px;margin:40px auto;padding:0 20px;line-height:1.6}a{color:#111;font-weight:600;text-decoration:none}a:hover{text-decoration:underline}li{padding:6px 0}</style></head><body><p><a href="/#labthweb">&larr; Quay lại LABTHWEB</a></p><h2>labth${escapeHtml(decodedPath)}</h2><ul>${listItems}</ul></body></html>`);
+            }
+            targetFile = indexFile;
+            const qsIndex = req.url.indexOf("?");
+            const rawPath = qsIndex >= 0 ? req.url.slice(0, qsIndex) : req.url;
+            const qs = qsIndex >= 0 ? req.url.slice(qsIndex) : "";
+            phpRequestUrl = `${rawPath}${path.basename(indexFile)}${qs}`;
+        }
+
+        if (!fs.existsSync(targetFile) || !fs.statSync(targetFile).isFile()) {
+            return res.status(404).send("Not Found");
+        }
+
+        const ext = path.extname(targetFile).toLowerCase();
+        if (ext === ".sql" || ext === ".txt" || ext === ".md" || ext === ".log" || path.basename(targetFile) === ".htaccess") {
+            res.setHeader("Content-Disposition", "inline");
+            return res.type("text/plain; charset=utf-8").sendFile(targetFile);
+        }
+
+        if (ext !== ".php") {
+            return staticMiddleware(req, res, next);
+        }
+
+        try {
+            const body = await collectRequestBody(req);
+            const requestHeaders = {};
+            for (const [key, value] of Object.entries(req.headers || {})) {
+                if (typeof value === "string") {
+                    requestHeaders[key.toLowerCase()] = value;
+                } else if (Array.isArray(value) && value.length) {
+                    requestHeaders[key.toLowerCase()] = value.join(", ");
+                }
+            }
+            delete requestHeaders["content-length"];
+
+            const phpRes = await enqueueWasmTask(async () => {
+                const { handler } = await getOrCreateWasmContext();
+                return await handler.request({
+                    url: phpRequestUrl,
+                    method: req.method,
+                    headers: requestHeaders,
+                    body: body ? new Uint8Array(body) : undefined
+                });
+            });
+
+            const responseHeaders = {};
+            for (const [key, values] of Object.entries(phpRes.headers || {})) {
+                const lowerKey = key.toLowerCase();
+                if (lowerKey === "content-length" || lowerKey === "transfer-encoding") {
+                    continue;
+                }
+                responseHeaders[lowerKey] = Array.isArray(values) ? (values.length === 1 ? values[0] : values) : values;
+            }
+
+            if (phpRes.httpStatusCode >= 300 && phpRes.httpStatusCode < 400 && !responseHeaders.location) {
+                const fallbackLoc = extractInlineRedirectLocation(targetFile);
+                if (fallbackLoc) {
+                    responseHeaders.location = fallbackLoc;
+                }
+            }
+
+            if (typeof responseHeaders.location === "string" && responseHeaders.location.startsWith("http://127.0.0.1")) {
+                responseHeaders.location = responseHeaders.location.slice("http://127.0.0.1".length) || "/";
+            }
+
+            const wantDownload = req.query && req.query.download === "1";
+            if (!wantDownload) {
+                const disposition = String(responseHeaders["content-disposition"] || "").toLowerCase();
+                if (!disposition || disposition.startsWith("attachment")) {
+                    responseHeaders["content-disposition"] = "inline";
+                }
+            }
+
+            if (!responseHeaders["content-type"]) {
+                responseHeaders["content-type"] = "text/html; charset=utf-8";
+            }
+
+            res.writeHead(phpRes.httpStatusCode || 200, responseHeaders);
+            return res.end(Buffer.from(phpRes.bytes || []));
+        } catch (error) {
+            console.warn(`PHP-WASM fallback for ${toPosixRelative(targetFile)}:`, error.message || error.name || error);
+            if (!error || error.name !== "ErrnoError") {
+                wasmContextPromise = null;
+            }
+            if (res.headersSent) {
+                return;
+            }
+            const source = fs.readFileSync(targetFile, "utf8");
+            const relPath = toPosixRelative(targetFile);
+            const reason = error && error.name === "ErrnoError"
+                ? "Bài lab này có kết nối MySQL (mặc định môi trường này chưa chạy MySQL Server), nên hiển thị mã nguồn để tham khảo."
+                : "Không thể thực thi trực tiếp bài lab này trong PHP WebAssembly; hiển thị mã nguồn để tham khảo.";
+            res.setHeader("Content-Disposition", "inline");
+            return res.status(200).type("html").send(buildStaticPhpHtmlPreview(relPath, source, reason));
+        }
+    };
 }
 
 function proxyToPhp(req, res, next, fallbackHandler, attempt = 0) {
-    if (!phpAvailable) {
+    if (!phpAvailable || phpMode !== "native") {
         return fallbackHandler(req, res, next);
     }
 
@@ -329,7 +592,7 @@ function proxyToPhp(req, res, next, fallbackHandler, attempt = 0) {
     );
 
     proxyReq.on("error", (error) => {
-        if (!phpAvailable) {
+        if (!phpAvailable || phpMode !== "native") {
             return fallbackHandler(req, res, next);
         }
 
@@ -350,13 +613,14 @@ function proxyToPhp(req, res, next, fallbackHandler, attempt = 0) {
     req.pipe(proxyReq);
 }
 
-function buildStaticPhpHtmlPreview(relPath, source) {
+function buildStaticPhpHtmlPreview(relPath, source, customNotice) {
     const baseDir = path.posix.dirname(`/labth/${relPath}`).replace(/\/?$/, "/");
     const withoutPhp = String(source || "")
         .replace(/<\?(?:php|=)?[\s\S]*?\?>/gi, "")
         .replace(/<\?(?:php|=)?[\s\S]*$/i, "")
         .trim();
     const hasHtmlMarkup = /<[a-z][\s\S]*>/i.test(withoutPhp);
+    const noticeText = customNotice || `Chế độ xem trực tiếp mã nguồn${hasHtmlMarkup ? " và giao diện HTML tĩnh" : ""}.`;
 
     let srcdoc = "";
     if (hasHtmlMarkup) {
@@ -393,8 +657,8 @@ function buildStaticPhpHtmlPreview(relPath, source) {
         <span><strong>labth/${escapeHtml(relPath)}</strong></span>
     </div>
     <div class="notice">
-        <strong>Chế độ xem trên trình duyệt (Node Preview): labth/${escapeHtml(relPath)}</strong>
-        <span>Máy chủ hiện tại chưa có PHP CLI nên hiển thị mã nguồn${hasHtmlMarkup ? " và giao diện HTML tĩnh" : ""}. Khi deploy Render bằng Docker (theo <code>render.yaml</code> / <code>Dockerfile</code>), bài lab này sẽ thực thi PHP đầy đủ.</span>
+        <strong>labth/${escapeHtml(relPath)}</strong>
+        <span>${escapeHtml(noticeText)}</span>
     </div>
     ${hasHtmlMarkup ? `
     <div class="tabs">
@@ -480,12 +744,16 @@ function createStaticFallbackHandler() {
 }
 
 function createLabMiddleware() {
+    const staticMiddleware = express.static(LABTH_DIR);
     const fallbackHandler = createStaticFallbackHandler();
+    const wasmHandler = createWasmHandler(staticMiddleware, fallbackHandler);
 
     return (req, res, next) => {
         if (!fs.existsSync(LABTH_DIR)) {
             return res.status(404).send("labth folder not found.");
         }
+
+        detectPhpModeSync();
 
         let decodedPath = "/";
         try {
@@ -503,8 +771,13 @@ function createLabMiddleware() {
             return res.redirect(302, "/#labthweb");
         }
 
-        if (phpAvailable) {
-            return proxyToPhp(req, res, next, fallbackHandler);
+        if (phpMode === "wasm") {
+            return wasmHandler(req, res, next);
+        }
+
+        if (phpAvailable && phpMode === "native") {
+            const onFallback = (r, s, n) => (phpMode === "wasm" ? wasmHandler(r, s, n) : fallbackHandler(r, s, n));
+            return proxyToPhp(req, res, next, onFallback);
         }
 
         return fallbackHandler(req, res, next);

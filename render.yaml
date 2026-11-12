@@ -1,9 +1,9 @@
 services:
   - type: web
     name: websneaker
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
     healthCheckPath: /
     envVars:
       - key: PORT
