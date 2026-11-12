@@ -565,6 +565,12 @@ body.panel-open {
     text-transform: uppercase;
 }
 
+.lab-runtime-badge.is-fallback {
+    background: var(--gray-light);
+    color: var(--black);
+    border: 1px solid #d4d4d4;
+}
+
 .labs-toolbar {
     display: flex;
     align-items: center;

@@ -141,7 +141,9 @@ const state = {
     labsFilter: "all",
     labsSearch: "",
     labsLoaded: false,
-    phpAvailable: true
+    labServerActive: false,
+    labServerBase: "",
+    phpAvailable: false
 };
 
 const elements = {
@@ -813,7 +815,12 @@ function closeAdminModal() {
     syncBodyLock();
 }
 
+const DIRECT_BROWSER_LAB_EXTS = new Set(["html", "htm", "png", "jpg", "jpeg", "gif", "svg", "webp", "pdf"]);
+
 function getLabBasePath() {
+    if (state.labServerActive) {
+        return `${state.labServerBase}/labth/`;
+    }
     if (window.location.protocol === "file:" || window.location.pathname.includes("/frontend/")) {
         return "../labth/";
     }
@@ -828,6 +835,124 @@ function buildLabHref(relPath) {
     return `${getLabBasePath()}${encoded}`;
 }
 
+function buildLabPreviewHtml(relPath, rawUrl, source, ext) {
+    const resolvedUrl = new URL(rawUrl, window.location.href).href;
+    const baseDir = new URL(".", resolvedUrl).href;
+    const isPhp = ext === "php";
+    const withoutPhp = isPhp
+        ? String(source || "")
+            .replace(/<\?(?:php|=)?[\s\S]*?\?>/gi, "")
+            .replace(/<\?(?:php|=)?[\s\S]*$/i, "")
+            .trim()
+        : "";
+    const hasHtmlMarkup = isPhp && /<[a-z][\s\S]*>/i.test(withoutPhp);
+
+    let srcdoc = "";
+    if (hasHtmlMarkup) {
+        if (/<head(?:\s[^>]*)?>/i.test(withoutPhp)) {
+            srcdoc = withoutPhp.replace(/<head(?:\s[^>]*)?>/i, (match) => `${match}<base href="${escapeHtml(baseDir)}">`);
+        } else {
+            srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><base href="${escapeHtml(baseDir)}"></head><body>${withoutPhp}</body></html>`;
+        }
+    }
+
+    return `<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${escapeHtml(relPath)} - Trình duyệt LABTHWEB</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 1040px; margin: 32px auto; padding: 0 20px; color: #111; line-height: 1.6; }
+        .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #111; color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+        .notice { background: #f5f5f5; border: 1px solid #ddd; border-radius: 14px; padding: 16px 18px; margin-bottom: 18px; }
+        .notice strong { display: block; margin-bottom: 4px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+        .tab-btn { padding: 8px 14px; border-radius: 999px; border: 1px solid #d4d4d4; background: #fff; font-weight: 700; cursor: pointer; }
+        .tab-btn.active { background: #111; color: #fff; border-color: #111; }
+        .panel.is-hidden { display: none; }
+        iframe { width: 100%; min-height: 460px; border: 1px solid #ddd; border-radius: 14px; background: #fff; }
+        pre { background: #111; color: #f5f5f5; padding: 20px; border-radius: 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <strong>labth/${escapeHtml(relPath)}</strong>
+        <span class="badge">Browser Preview</span>
+    </div>
+    <div class="notice">
+        <strong>Mở trực tiếp trên trình duyệt: labth/${escapeHtml(relPath)}</strong>
+        <span>Trang hiện đang chạy ở chế độ tĩnh (chưa kết nối máy chủ PHP). Để thực thi PHP trực tiếp, hãy chạy backend Node/Docker (Render) hoặc XAMPP/MAMP.</span>
+    </div>
+    ${hasHtmlMarkup ? `
+    <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="source">Mã nguồn ${escapeHtml(ext.toUpperCase())}</button>
+        <button class="tab-btn" type="button" data-tab="render">Giao diện HTML</button>
+    </div>` : ""}
+    <div class="panel" data-panel="source">
+        <pre><code>${escapeHtml(source)}</code></pre>
+    </div>
+    ${hasHtmlMarkup ? `
+    <div class="panel is-hidden" data-panel="render">
+        <iframe sandbox title="${escapeHtml(relPath)}" srcdoc="${escapeHtml(srcdoc)}"></iframe>
+    </div>
+    <script>
+        document.querySelectorAll("[data-tab]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var target = btn.getAttribute("data-tab");
+                document.querySelectorAll("[data-tab]").forEach(function (b) { b.classList.toggle("active", b === btn); });
+                document.querySelectorAll("[data-panel]").forEach(function (p) { p.classList.toggle("is-hidden", p.getAttribute("data-panel") !== target); });
+            });
+        });
+    </script>` : ""}
+</body>
+</html>`;
+}
+
+function writePreviewTabHtml(tab, html) {
+    tab.document.open();
+    tab.document.write(html);
+    tab.document.close();
+}
+
+async function openLabPreviewTab(rawUrl, relPath, ext) {
+    const previewWin = window.open("", "_blank");
+    if (!previewWin) {
+        showToast("Trình duyệt đang chặn cửa sổ mới. Hãy cho phép pop-up để mở bài lab.");
+        return;
+    }
+
+    writePreviewTabHtml(
+        previewWin,
+        `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${escapeHtml(relPath)}</title><style>body{font-family:system-ui,sans-serif;padding:40px 20px;text-align:center;color:#111;}</style></head><body>Đang mở <strong>labth/${escapeHtml(relPath)}</strong> trong trình duyệt...</body></html>`
+    );
+
+    if (window.location.protocol === "file:") {
+        writePreviewTabHtml(
+            previewWin,
+            `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${escapeHtml(relPath)}</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 20px;line-height:1.6;color:#111;}.box{background:#f5f5f5;border:1px solid #ddd;border-radius:14px;padding:20px;}</style></head><body><div class="box"><h2>Không thể tải trực tiếp qua file://</h2><p>File <strong>labth/${escapeHtml(relPath)}</strong> là file <code>.${escapeHtml(ext)}</code> nên đã chặn hành động tự tải xuống.</p><p>Để mở bài lab trực tiếp trên trình duyệt, hãy mở qua <strong>Render</strong>, <strong>VS Code Live Server</strong>, hoặc chạy backend (<code>cd backend &amp;&amp; npm start</code>).</p></div></body></html>`
+        );
+        previewWin.opener = null;
+        return;
+    }
+
+    try {
+        const response = await fetch(rawUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const source = await response.text();
+        writePreviewTabHtml(previewWin, buildLabPreviewHtml(relPath, rawUrl, source, ext));
+    } catch (error) {
+        writePreviewTabHtml(
+            previewWin,
+            `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${escapeHtml(relPath)}</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 20px;line-height:1.6;color:#111;}.box{background:#f5f5f5;border:1px solid #ddd;border-radius:14px;padding:20px;}</style></head><body><div class="box"><h2>Không thể mở bài lab</h2><p>Không đọc được nội dung của <strong>labth/${escapeHtml(relPath)}</strong> (${escapeHtml(error.message)}).</p></div></body></html>`
+        );
+    }
+    previewWin.opener = null;
+}
+
 function renderLabs() {
     if (!elements.labsContent || !elements.labsFilters) {
         return;
@@ -837,8 +962,13 @@ function renderLabs() {
     const totalAll = groups.reduce((sum, group) => sum + group.items.length, 0);
 
     if (elements.labsStatus) {
-        elements.labsStatus.textContent = state.phpAvailable ? "PHP Ready" : "Source Preview";
-        elements.labsStatus.classList.toggle("is-fallback", !state.phpAvailable);
+        if (state.labServerActive) {
+            elements.labsStatus.textContent = state.phpAvailable ? "PHP Ready" : "Node Preview";
+            elements.labsStatus.classList.toggle("is-fallback", !state.phpAvailable);
+        } else {
+            elements.labsStatus.textContent = "Browser Preview";
+            elements.labsStatus.classList.add("is-fallback");
+        }
     }
 
     const filterButtons = [
@@ -884,8 +1014,19 @@ function renderLabs() {
                 <span class="lab-group-count">${group.items.length} file</span>
             </div>
             <div class="lab-grid">
-                ${group.items.map((item) => `
-                    <a class="lab-card" href="${escapeHtml(buildLabHref(item.path))}" target="_blank" rel="noopener noreferrer">
+                ${group.items.map((item) => {
+                    const ext = String(item.ext || "").toLowerCase();
+                    const rawUrl = buildLabHref(item.path);
+                    const canOpenDirectly = state.labServerActive || DIRECT_BROWSER_LAB_EXTS.has(ext);
+                    const hrefAttr = canOpenDirectly
+                        ? escapeHtml(rawUrl)
+                        : `#lab-view-${encodeURIComponent(item.path)}`;
+                    const linkAttrs = canOpenDirectly
+                        ? `target="_blank" rel="noopener noreferrer"`
+                        : `data-lab-preview="1" data-lab-url="${escapeHtml(rawUrl)}" data-lab-path="${escapeHtml(item.path)}" data-lab-ext="${escapeHtml(ext || "file")}"`;
+
+                    return `
+                    <a class="lab-card" href="${hrefAttr}" ${linkAttrs}>
                         <div class="lab-card-info">
                             <span class="lab-card-name">${escapeHtml(item.name)}</span>
                             <span class="lab-card-path">labth/${escapeHtml(item.path)}</span>
@@ -895,10 +1036,29 @@ function renderLabs() {
                             <i class="fa-solid fa-arrow-up-right-from-square"></i>
                         </span>
                     </a>
-                `).join("")}
+                `;
+                }).join("")}
             </div>
         </section>
     `).join("");
+}
+
+async function probeLabsEndpoint(baseUrl) {
+    const response = await fetch(`${baseUrl}/api/labs`, {
+        headers: { Accept: "application/json" }
+    });
+    if (!response.ok) {
+        return null;
+    }
+    const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+    if (!contentType.includes("application/json")) {
+        return null;
+    }
+    const data = await response.json().catch(() => null);
+    if (data && data.serverMode === "express" && Array.isArray(data.groups)) {
+        return data;
+    }
+    return null;
 }
 
 async function loadLabs(force = false) {
@@ -907,16 +1067,34 @@ async function loadLabs(force = false) {
         return;
     }
 
-    try {
-        const data = await apiFetch("/api/labs");
-        if (Array.isArray(data.groups)) {
-            state.labGroups = data.groups;
-            state.phpAvailable = Boolean(data.phpAvailable);
-            state.labsLoaded = true;
+    const candidates = window.location.protocol === "file:"
+        ? ["http://localhost:5000", "http://localhost:5001"]
+        : [""];
+
+    let found = false;
+    for (const baseUrl of candidates) {
+        try {
+            const data = await probeLabsEndpoint(baseUrl);
+            if (data) {
+                state.labServerActive = true;
+                state.labServerBase = baseUrl;
+                state.labGroups = data.groups;
+                state.phpAvailable = Boolean(data.phpAvailable);
+                state.labsLoaded = true;
+                found = true;
+                break;
+            }
+        } catch (error) {
+            // Try next candidate
         }
-    } catch (error) {
+    }
+
+    if (!found) {
+        state.labServerActive = false;
+        state.labServerBase = "";
         state.labGroups = DEFAULT_LAB_GROUPS;
-        state.phpAvailable = window.location.protocol !== "file:";
+        state.phpAvailable = false;
+        state.labsLoaded = true;
     }
 
     renderLabs();
@@ -930,6 +1108,7 @@ function openLabsModal() {
     elements.labsModal.classList.add("is-open");
     elements.labsModal.setAttribute("aria-hidden", "false");
     syncBodyLock();
+    renderLabs();
     loadLabs();
 }
 
@@ -1540,6 +1719,17 @@ function bindEvents() {
             renderLabs();
         }
 
+        const labPreviewCard = event.target.closest("[data-lab-preview]");
+        if (labPreviewCard) {
+            event.preventDefault();
+            openLabPreviewTab(
+                labPreviewCard.dataset.labUrl || "",
+                labPreviewCard.dataset.labPath || "",
+                labPreviewCard.dataset.labExt || "file"
+            );
+            return;
+        }
+
         if (event.target.closest("[data-search-button]")) {
             scrollToShop();
             elements.searchInput.focus();
@@ -1736,6 +1926,8 @@ async function bootstrap() {
             showToast("Your session expired. Please login again.");
         }
     }
+
+    loadLabs();
 
     if (window.location.hash === "#labthweb") {
         openLabsModal();

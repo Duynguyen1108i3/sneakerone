@@ -149,7 +149,7 @@ function scanLabSubdir(dirPath, groupFolder, depth, items) {
 
 function scanLabDirectory() {
     if (!fs.existsSync(LABTH_DIR)) {
-        return { phpAvailable, groups: [] };
+        return { serverMode: "express", phpAvailable, groups: [] };
     }
 
     const entries = fs.readdirSync(LABTH_DIR, { withFileTypes: true });
@@ -213,6 +213,7 @@ function scanLabDirectory() {
     }
 
     return {
+        serverMode: "express",
         phpAvailable,
         groups
     };
@@ -309,6 +310,19 @@ function proxyToPhp(req, res, next, fallbackHandler, attempt = 0) {
                 }
             }
 
+            const reqPath = String(req.path || "").toLowerCase();
+            const wantDownload = req.query && req.query.download === "1";
+            if (!wantDownload) {
+                const disposition = String(responseHeaders["content-disposition"] || "").toLowerCase();
+                if (disposition.startsWith("attachment")) {
+                    responseHeaders["content-disposition"] = "inline";
+                }
+            }
+
+            if (!responseHeaders["content-type"] && (reqPath.endsWith(".php") || reqPath.endsWith(".html") || reqPath.endsWith("/"))) {
+                responseHeaders["content-type"] = "text/html; charset=utf-8";
+            }
+
             res.writeHead(proxyRes.statusCode || 200, responseHeaders);
             proxyRes.pipe(res);
         }
@@ -336,6 +350,77 @@ function proxyToPhp(req, res, next, fallbackHandler, attempt = 0) {
     req.pipe(proxyReq);
 }
 
+function buildStaticPhpHtmlPreview(relPath, source) {
+    const baseDir = path.posix.dirname(`/labth/${relPath}`).replace(/\/?$/, "/");
+    const withoutPhp = String(source || "")
+        .replace(/<\?(?:php|=)?[\s\S]*?\?>/gi, "")
+        .replace(/<\?(?:php|=)?[\s\S]*$/i, "")
+        .trim();
+    const hasHtmlMarkup = /<[a-z][\s\S]*>/i.test(withoutPhp);
+
+    let srcdoc = "";
+    if (hasHtmlMarkup) {
+        if (/<head(?:\s[^>]*)?>/i.test(withoutPhp)) {
+            srcdoc = withoutPhp.replace(/<head(?:\s[^>]*)?>/i, (match) => `${match}<base href="${escapeHtml(baseDir)}">`);
+        } else {
+            srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><base href="${escapeHtml(baseDir)}"></head><body>${withoutPhp}</body></html>`;
+        }
+    }
+
+    return `<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${escapeHtml(relPath)} - PHP Preview</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 1040px; margin: 32px auto; padding: 0 20px; color: #111; line-height: 1.6; }
+        .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .back-link { color: #111; font-weight: 700; text-decoration: none; }
+        .notice { background: #f5f5f5; border: 1px solid #ddd; border-radius: 14px; padding: 16px 18px; margin-bottom: 18px; }
+        .notice strong { display: block; margin-bottom: 4px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+        .tab-btn { padding: 8px 14px; border-radius: 999px; border: 1px solid #d4d4d4; background: #fff; font-weight: 700; cursor: pointer; }
+        .tab-btn.active { background: #111; color: #fff; border-color: #111; }
+        .panel.is-hidden { display: none; }
+        iframe { width: 100%; min-height: 460px; border: 1px solid #ddd; border-radius: 14px; background: #fff; }
+        pre { background: #111; color: #f5f5f5; padding: 20px; border-radius: 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a class="back-link" href="/#labthweb">&larr; Quay lại LABTHWEB</a>
+        <span><strong>labth/${escapeHtml(relPath)}</strong></span>
+    </div>
+    <div class="notice">
+        <strong>Chế độ xem trên trình duyệt (Node Preview): labth/${escapeHtml(relPath)}</strong>
+        <span>Máy chủ hiện tại chưa có PHP CLI nên hiển thị mã nguồn${hasHtmlMarkup ? " và giao diện HTML tĩnh" : ""}. Khi deploy Render bằng Docker (theo <code>render.yaml</code> / <code>Dockerfile</code>), bài lab này sẽ thực thi PHP đầy đủ.</span>
+    </div>
+    ${hasHtmlMarkup ? `
+    <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="source">Mã nguồn PHP</button>
+        <button class="tab-btn" type="button" data-tab="render">Giao diện HTML</button>
+    </div>` : ""}
+    <div class="panel" data-panel="source">
+        <pre><code>${escapeHtml(source)}</code></pre>
+    </div>
+    ${hasHtmlMarkup ? `
+    <div class="panel is-hidden" data-panel="render">
+        <iframe sandbox title="${escapeHtml(relPath)}" srcdoc="${escapeHtml(srcdoc)}"></iframe>
+    </div>
+    <script>
+        document.querySelectorAll("[data-tab]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var target = btn.getAttribute("data-tab");
+                document.querySelectorAll("[data-tab]").forEach(function (b) { b.classList.toggle("active", b === btn); });
+                document.querySelectorAll("[data-panel]").forEach(function (p) { p.classList.toggle("is-hidden", p.getAttribute("data-panel") !== target); });
+            });
+        });
+    </script>` : ""}
+</body>
+</html>`;
+}
+
 function createStaticFallbackHandler() {
     const staticMiddleware = express.static(LABTH_DIR);
 
@@ -354,9 +439,24 @@ function createStaticFallbackHandler() {
 
         let targetFile = resolvedPath;
         if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isDirectory()) {
+            if (!req.path.endsWith("/")) {
+                const qs = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+                return res.redirect(302, `${req.baseUrl}${req.path}/${qs}`);
+            }
+
             const indexFile = findIndexEntry(resolvedPath);
             if (indexFile) {
                 targetFile = indexFile;
+            } else {
+                const entries = fs.readdirSync(resolvedPath, { withFileTypes: true })
+                    .filter((entry) => !entry.name.startsWith("."))
+                    .sort((a, b) => naturalCompare(a.name, b.name));
+                const listItems = entries.map((entry) => {
+                    const suffix = entry.isDirectory() ? "/" : "";
+                    return `<li><a href="${escapeHtml(encodeURIComponent(entry.name) + suffix)}">${escapeHtml(entry.name + suffix)}</a></li>`;
+                }).join("");
+                res.setHeader("Content-Disposition", "inline");
+                return res.status(200).type("html").send(`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>labth${escapeHtml(decodedPath)}</title><style>body{font-family:system-ui,sans-serif;max-width:860px;margin:40px auto;padding:0 20px;line-height:1.6}a{color:#111;font-weight:600;text-decoration:none}a:hover{text-decoration:underline}li{padding:6px 0}</style></head><body><p><a href="/#labthweb">&larr; Quay lại LABTHWEB</a></p><h2>labth${escapeHtml(decodedPath)}</h2><ul>${listItems}</ul></body></html>`);
             }
         }
 
@@ -365,32 +465,12 @@ function createStaticFallbackHandler() {
             if (ext === ".php") {
                 const source = fs.readFileSync(targetFile, "utf8");
                 const relPath = toPosixRelative(targetFile);
-                return res.status(200).type("html").send(`<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${escapeHtml(relPath)} - PHP Preview</title>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; max-width: 960px; margin: 40px auto; padding: 0 20px; color: #111; line-height: 1.6; }
-        .notice { background: #f5f5f5; border: 1px solid #ddd; border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; }
-        .notice strong { display: block; margin-bottom: 6px; }
-        .back-link { display: inline-block; margin-bottom: 16px; color: #111; font-weight: 700; text-decoration: none; }
-        pre { background: #111; color: #f5f5f5; padding: 20px; border-radius: 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
-    </style>
-</head>
-<body>
-    <a class="back-link" href="/#labthweb">&larr; Quay lại LABTHWEB</a>
-    <div class="notice">
-        <strong>Chế độ xem mã nguồn: labth/${escapeHtml(relPath)}</strong>
-        <span>Máy chủ hiện tại chưa có PHP CLI nên không thực thi trực tiếp file <code>.php</code>. Khi deploy lên Render (Docker) hoặc chạy qua XAMPP/MAMP, bài lab này sẽ chạy PHP đầy đủ.</span>
-    </div>
-    <pre><code>${escapeHtml(source)}</code></pre>
-</body>
-</html>`);
+                res.setHeader("Content-Disposition", "inline");
+                return res.status(200).type("html").send(buildStaticPhpHtmlPreview(relPath, source));
             }
 
-            if (ext === ".sql") {
+            if (ext === ".sql" || ext === ".txt" || ext === ".md" || ext === ".log" || path.basename(targetFile) === ".htaccess") {
+                res.setHeader("Content-Disposition", "inline");
                 return res.type("text/plain; charset=utf-8").sendFile(targetFile);
             }
         }
